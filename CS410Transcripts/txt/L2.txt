@@ -1,0 +1,200 @@
+you
+in this lecture we're going to talk
+about the text access in the previous
+lecture we talked about the natural
+remedy content analysis we explained
+that the state-of-the-art natural remedy
+processing techniques are still not good
+enough to process a lot of unrestricted
+text data in a robust manner as a result
+bag-of-words recognition remains very
+popular in applications neither search
+engines in this lecture we're going to
+talk about some high-level strategies to
+help users get access to the text data
+this is also an important step to
+convert raw big text data into small
+random in the data that are actually
+needed in a specific application so the
+main question you address here is how
+can a text information system help users
+get access to the realm in the text data
+we're going to cover two complementary
+strategies push versus pull and then
+we're going to talk about two ways to
+implement the poor mode query
+versus browsing so first push versus
+poor these are two different ways to
+connect the users with the right
+information at the right time the
+difference is which takes the initiative
+which party takes the initiative in the
+poor mode the users would take the
+initiative to start the information
+access process and in this case a user
+typically would use a search engine to
+fulfill the goal for example the user
+may type in the query and then browse
+the results to find the relevant
+information so this is really
+appropriate for satisfying users of
+information in an acting formation
+either is a temporary information need
+for example you want to buy a product so
+you'll suddenly have a need
+to read reviews about related products
+but after you have collected information
+have purchased your product you
+generally no longer need a such
+information so it's a temporary
+information needed in such a case it's
+very hard for a system to predict to
+your need and it's more appropriate for
+the users to take the initiative and
+that's why search engines are very
+useful today because many people have
+many other information needs all the
+time
+so as we're speaking Google properties
+process in many queries from us and
+those are all or mostly arrow
+information needs so this is the poor
+mode in contrast in the push mode the
+system would take the initiative to push
+the information to the user or to
+recommend information to the user so in
+this case this is usually supported by a
+recommender system now this would be
+appropriate if the user has a stable
+information for example you may have a
+research interest in some topic and that
+interest tends to stay for a while so
+it's relatively stable your hobby is
+another example of a stable information
+need in such a case the system can
+interact with you and can learn your
+interest and then can monitor the
+information stream if it is the system
+has seen in irrelevant items to you
+interest the system could then take the
+initiative to recommend information to
+you so for example a news filter or news
+recommender system could monitor the
+news stream and identify interesting
+news to you and simply push the news
+articles to you this mode of information
+access may be also appropriate when the
+system has good knowledge about the
+users need and this happens in the
+search context so for example when you
+search for information on the web a
+search engine might infer you might be
+also interesting some related
+information and they would recommend in
+from
+so that should remind you for example
+advertisement place the research of age
+so this is about the two high level
+strategies or two modes of texture
+access now let's look at the poor mode
+in more detail in the poor mode we can
+further distinguish in two ways to help
+users query versus browsing the inquiry
+a user would just end up query typically
+keyword query and the search engine
+system would return randomly documents
+to users and this works well when the
+user knows what exactly are the keywords
+to be used so if you know exactly what
+you're looking for you tend to know the
+right keywords and then query will work
+very well and we do that all the time
+but we also know that sometimes it
+doesn't work so well when you don't know
+the right keywords reduce in the query
+or you want to browse information in
+some topic area in this case browsing
+would be more useful so in this case in
+the case of browsing the users would
+simply navigate into the relevant
+information by following the path is
+supported by the structures on documents
+so the system would maintain some kind
+of structures and then the user could
+follow these structures to navigate so
+this strategy works well when the user
+wants to explore the information space
+or the user doesn't know what are the
+keywords to use in the query or simply
+because the user finds it inconvenient
+to type in a query so even if a user
+knows what query to type in if the user
+is using a cellphone to search for
+information then it's still hard to
+enter the query in such a case again
+browsing tends to be more convenient the
+relationship between browsing and the
+query is best understood by making
+analogy to the sightseeing imagining if
+you are touring the city now if you know
+the exact address of attraction then
+taking a taxi there is perhaps the
+fastest way and you can go directly to
+the site but if you don't know the exact
+address you may need to walk around or
+you can take a taxi to a nearby place
+and then walk around it turns out that
+we do exact the same in the information
+space if you know exactly what you are
+looking for then you can use the right
+keywords in your query to finally
+implement in directory that's usually
+the fastest way to do final information
+but what if you don't know the exact
+keywords to use well your query probably
+won't work so well you will end on some
+related pages and then you need to also
+walk around in the information space
+meaning by following the links or by
+browsing you can then finally get into
+the relevant page if you want to learn
+about topic again you know what you will
+likely do a lot of browsing so just like
+you are looking around in some area and
+you want to see some interesting
+attractions in a related in the same
+region so this analogy also tells us
+that today we have very good spot for
+query but we don't really have good spot
+for browsing and this is because in
+order to browse effectively we need a
+map to guide us just like you need a map
+of Chicago the two of the city of
+Chicago you need a copula map to tour
+the information space so how to
+construct such a topic map is in fact a
+very interesting research question that
+likely will bring us more interesting
+browsing spans on the web or in other
+applications so to summarize this
+lecture we have talked about the two
+high-level strategies for texture access
+push and pour push tends to be supported
+by recommender system and poor tends to
+be supported by a search engine of
+course in a sophisticated
+inheriting the information system we
+should combine the two in the poor mode
+we can further this movie
+query and browsing again we generally
+want to combine the two ways to help
+users so that you can support both query
+and browsing if you want to know more
+about the relationship between poor and
+push you can read this article this
+gives excellent discussion of the
+relationship between information
+filtering and information retrieval here
+information filtering is similar to
+information recommendation or the push
+mode of information access
