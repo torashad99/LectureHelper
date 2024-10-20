@@ -1,4 +1,5 @@
 *.env
 *.jsonl
 *.vsix
+*:Zone.Identifier
 demo/
