@@ -12,7 +12,7 @@ client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 # Define a function to get the embedding of a text using a specified model
 def get_embedding(text, model="text-embedding-3-small"):
     # Replace newline characters with spaces in the text
-    text = text.replace("\n", " ")
+    # text = text.replace("\n", " ")
 
     # Use the OpenAI client to create embeddings for the text using the specified model
     # and return the first embedding from the result
