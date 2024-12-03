@@ -175,7 +175,7 @@ Key Changes:
 - New: Combined JSONL with efficient filtering
 
 ## Credits
-Based on CS410 course materials, specifically:
+Based on examples/embeddings/openai/ materials, specifically:
 - `examples/embeddings/openai/01_create_embeddings.py`
 - `examples/embeddings/openai/04_reverse_search.py`
 - `examples/embeddings/openai/05_text.py`
