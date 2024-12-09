@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from services.embedding_service import process_all_videos
+from services.embedding_service import process_all_videos, init_lecture_embeddings
 
 api_routes = Blueprint('api_routes', __name__)
 
@@ -16,3 +16,4 @@ def process_embeddings():
         return jsonify({'status': 'success'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500 
+

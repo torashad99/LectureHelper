@@ -114,8 +114,8 @@ if (lecture_index and start_time) and (response_text != "This is not a relevant 
     lecture_number = int(lecture_index[1:])
     # print(f"\nThis came from Lecture {lecture_number}, which the professor talks about the topic around {start_time}.")
     print(f"\nThe professor talks about this in Lecture {lecture_number}, around the {start_time} mark.")
-# else:
-#     print("\nCould not find a matching timestamp in the VTT files.")
+else:
+    print("\nCould not find a matching timestamp in the VTT files.")
 
 # # Set a similarity threshold
 # similarity_threshold = 0.7  # Adjust this value as needed

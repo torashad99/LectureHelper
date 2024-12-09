@@ -31,18 +31,27 @@ class VideoProcessor:
             dir_path = Path.cwd() / 'data' / 'user_videos' / video_id
             dir_path.mkdir(parents=True, exist_ok=True)
             
-            # Get and save transcript as VTT
+            # Get transcript and save both VTT and clean text versions
             try:
                 transcript = YouTubeTranscriptApi.get_transcript(video_id)
+                
+                # Save VTT version
                 vtt_content = self._convert_to_vtt(transcript)
                 vtt_path = dir_path / 'transcript.vtt'
                 with open(vtt_path, 'w', encoding='utf-8') as f:
                     f.write(vtt_content)
+                    
+                # Save clean text version
+                text_content = ' '.join(item['text'] for item in transcript)
+                text_path = dir_path / 'transcript.txt'
+                with open(text_path, 'w', encoding='utf-8') as f:
+                    f.write(text_content)
+                    
             except Exception as e:
                 print(f"Error getting transcript: {e}")
-                # Continue even if transcript fails
-                
-            # Save video metadata
+                raise e
+
+            # Save metadata
             metadata = {
                 'id': video_id,
                 'title': video_title,

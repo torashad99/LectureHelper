@@ -4,7 +4,7 @@ from config.video_config import VIDEO_MAPPINGS, VIDEO_TITLES
 from pathlib import Path
 import shutil
 import json
-from services.embedding_service import process_transcript, process_user_query, process_multiple_videos_query
+from services.embedding_service import process_transcript, process_user_query, process_multiple_videos_query, init_lecture_embeddings
 
 video_routes = Blueprint('video_routes', __name__)
 video_processor = VideoProcessor()
@@ -165,3 +165,4 @@ def search():
             'success': False,
             'error': str(e)
         }), 500
+

@@ -5,34 +5,39 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import re
 import numpy as np
+import webvtt
+from typing import List
 
 load_dotenv()
 
 client = OpenAI(api_key=os.environ["OPEN_AI_API_KEY"])
 
 def sliding_window_vtt(best_chunk, vtt_directory):
-    # Split the best chunk into words
-    words = best_chunk.split()
-    start_index = 1
-    window_size = 5
+    # Normalize the search text
+    search_text = ' '.join(best_chunk.lower().split())
     
-    for i in range(start_index, len(words) - window_size + 1):
-        window = ' '.join(words[i:i+window_size])
-        
-        vtt_file = Path(vtt_directory) / 'transcript.vtt'
-        if vtt_file.exists():
-            with open(vtt_file, 'r', encoding='utf-8') as f:
-                content = f.read()
-                pattern = re.compile(re.escape(window), re.IGNORECASE)
-                match = pattern.search(content)
-                
-                if match:
-                    lines = content[:match.start()].split('\n')
-                    for line in reversed(lines):
-                        if '-->' in line:
-                            return line.split(' --> ')[0]
-    
-    return None
+    for vtt_file in Path(vtt_directory).glob('L*.vtt'):
+        try:
+            captions = list(webvtt.read(vtt_file))
+            if not captions:
+                continue
+
+            # Build concatenated text with timestamps
+            for i in range(len(captions)):
+                concatenated_text = ""
+                for j in range(i, min(i + 5, len(captions))):
+                    if concatenated_text:
+                        concatenated_text += ' '
+                    concatenated_text += captions[j].text.lower()
+
+                if "document ranking" in concatenated_text or "rank these relevant documents" in concatenated_text:
+                    return vtt_file.stem, captions[i].start
+
+        except Exception as e:
+            print(f"Error processing {vtt_file}: {e}")
+            continue
+            
+    return None, None
 
 def create_embeddings_file(transcript_dir, output_file='embeddings.jsonl'):
     embeddings = {}
@@ -156,7 +161,7 @@ def process_transcript(video_id):
     try:
         # Get paths
         video_dir = Path.cwd() / 'data' / 'user_videos' / video_id
-        transcript_file = video_dir / 'transcript.vtt'
+        transcript_file = video_dir / 'transcript.txt'
         embeddings_file = video_dir / 'embeddings.jsonl'
         
         if not transcript_file.exists():
@@ -165,29 +170,21 @@ def process_transcript(video_id):
             
         # Read and process the transcript
         with open(transcript_file, 'r', encoding='utf-8') as f:
-            data = f.read().replace("\n", " ")
-            # Split into chunks of 500 characters
+            data = f.read()
             chunks = [data[i:i+500] for i in range(0, len(data), 500)]
             
             embeddings = {}
             for chunk in chunks:
                 # Get embedding and timestamp for each chunk
                 embedding = get_embedding(chunk)
-                # Pass the directory containing the VTT file
+                # Still use VTT for timestamp lookup
                 timestamp = sliding_window_vtt(chunk, str(video_dir))
                 
-                if timestamp:
-                    embeddings[chunk] = {
-                        "embedding": embedding,
-                        "timestamp": timestamp
-                    }
-                else:
-                    # If no timestamp found, still store the embedding
-                    embeddings[chunk] = {
-                        "embedding": embedding,
-                        "timestamp": None
-                    }
-        
+                embeddings[chunk] = {
+                    "embedding": embedding,
+                    "timestamp": timestamp or None
+                }
+
         # Write embeddings to file
         with open(embeddings_file, 'w') as f:
             for chunk, data in embeddings.items():
@@ -247,73 +244,145 @@ def process_video_query(query, video_id):
 
 def process_multiple_videos_query(query, video_ids):
     print("\n=== Starting Search Process ===")
-    results = []
+    print(f"Looking for videos: {video_ids}")
     embeddings_file = Path.cwd() / 'data' / 'embeddings' / 'combined_embeddings.jsonl'
     
-    if not embeddings_file.exists():
-        print("Combined embeddings file not found")
-        return []
-        
-    query_embedding = get_embedding(query)
-    temp_results = []
-    
+    # Load all embeddings first
+    embeddings = {}
     with open(embeddings_file, 'r') as f:
         for line in f:
             data = json.loads(line)
             if data['video_id'] in video_ids:
-                score = np.dot(data['embedding'], query_embedding)
-                if score > 0.5:
-                    temp_results.append({
-                        "video_id": data['video_id'],
-                        "response": data['text'],
-                        "timestamp": data['timestamp'],
-                        "score": float(score)
-                    })
+                embeddings[data['text']] = {
+                    'embedding': data['embedding'],
+                    'video_id': data['video_id']
+                }
     
-    # Sort by video_id and timestamp
-    temp_results.sort(key=lambda x: (x['video_id'], convertTimestampToSeconds(x['timestamp'])))
+    # Get query embedding
+    query_embedding = get_embedding(query)
     
-    # Merge segments that are within 1 minute of each other
-    i = 0
-    while i < len(temp_results):
-        current = temp_results[i]
-        merged_response = current['response']
-        max_score = current['score']
-        j = i + 1
-        
-        while j < len(temp_results):
-            next_result = temp_results[j]
-            if (current['video_id'] == next_result['video_id'] and 
-                abs(convertTimestampToSeconds(current['timestamp']) - 
-                    convertTimestampToSeconds(next_result['timestamp'])) <= 60):
-                merged_response += " " + next_result['response']
-                max_score = max(max_score, next_result['score'])
-                j += 1
-            else:
-                break
-                
-        results.append({
-            "video_id": current['video_id'],
-            "response": merged_response,
-            "timestamp": current['timestamp'],
-            "score": max_score
-        })
-        i = j
+    # Find best matches
+    matches = []
+    for chunk, data in embeddings.items():
+        score = np.dot(data['embedding'], query_embedding)
+        if score > 0.5:  # Keep threshold for relevance
+            matches.append({
+                "text": chunk,
+                "video_id": data['video_id'],
+                "score": float(score)
+            })
     
     # Sort by score
-    results.sort(key=lambda x: x['score'], reverse=True)
-    return results[:5]
+    matches.sort(key=lambda x: x['score'], reverse=True)
+    
+    # Process top matches
+    temp_results = []
+    vtt_dir = Path.cwd() / 'CS410Transcripts' / 'vtt'
+    system_prompt = "You are a friendly and supportive teaching assistant for a course on Text Information Systems."
+    
+    # Take top 5 matches
+    for match in matches[:5]:
+        try:
+            lecture_index, found_timestamp = sliding_window_vtt(match['text'], str(vtt_dir))
+            if lecture_index and found_timestamp and lecture_index == match['video_id']:
+                prompt = f"Answer the question using the following information:\n\n{match['text']}\n\nQuestion: {query}"
+                chat_completion = client.chat.completions.create(
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": prompt}
+                    ],
+                    model="gpt-4"
+                )
+                
+                temp_results.append({
+                    "video_id": match['video_id'],
+                    "response": chat_completion.choices[0].message.content,
+                    "timestamp": found_timestamp,
+                    "score": match['score']
+                })
+                
+        except Exception as e:
+            print(f"Error processing match: {e}")
+            continue
+    
+    print(f"\nFound {len(temp_results)} results")
+    return temp_results
+
+def find_timestamp_in_vtt(chunk: str, vtt_file: str) -> str:
+    """
+    Find timestamp for a chunk of text in VTT file using webvtt-py
+    """
+    try:
+        if not Path(vtt_file).exists():
+            print(f"VTT file not found: {vtt_file}")
+            return None
+            
+        timestamps = reverseSearchText(vtt_file, chunk)
+        if timestamps:
+            return timestamps[0]  # Return first matching timestamp
+        return None
+        
+    except Exception as e:
+        print(f"Error finding timestamp: {e}")
+        return None
+
+def reverseSearchText(file_path: str, text_chunk: str) -> List[str]:
+    """
+    Searches for the text_chunk in the VTT file and returns the associated start timestamp(s).
+    """
+    timestamps = []
+    try:
+        captions = list(webvtt.read(file_path))
+        if not captions:
+            return timestamps
+
+        # Normalize the search text
+        search_text = ' '.join(text_chunk.lower().split())
+        
+        # Normalize captions' texts
+        normalized_captions = [' '.join(caption.text.lower().split()) for caption in captions]
+        start_times = [caption.start for caption in captions]
+
+        n = len(captions)
+        
+        # Iterate through each caption
+        for i in range(n):
+            concatenated_text = ""
+            for j in range(i, n):
+                if concatenated_text:
+                    concatenated_text += ' '
+                concatenated_text += normalized_captions[j]
+
+                if concatenated_text.startswith(search_text):
+                    timestamps.append(start_times[i])
+                    break
+
+                if len(concatenated_text) >= len(search_text):
+                    break
+
+        return list(dict.fromkeys(timestamps))
+
+    except Exception as e:
+        print(f"An error occurred while parsing the VTT file: {e}")
+        return []
 
 def convertTimestampToSeconds(timestamp):
     try:
-        # Handle timestamps with milliseconds (e.g., "37.889")
-        if '.' in timestamp:
-            return float(timestamp)
-            
-        # Handle MM:SS format
-        minutes, seconds = map(int, timestamp.split(':'))
-        return minutes * 60 + seconds
-    except ValueError as e:
+        # Handle HH:MM:SS.mmm format
+        if ':' in timestamp:
+            parts = timestamp.split(':')
+            if len(parts) == 3:  # HH:MM:SS.mmm
+                hours, minutes, seconds = parts
+                seconds = float(seconds)
+                return int(hours) * 3600 + int(minutes) * 60 + seconds
+            elif len(parts) == 2:  # MM:SS.mmm
+                minutes, seconds = parts
+                seconds = float(seconds)
+                return int(minutes) * 60 + seconds
+        # Handle decimal seconds format
+        return float(timestamp)
+        
+    except (ValueError, TypeError) as e:
         print(f"Error converting timestamp {timestamp}: {str(e)}")
         return 0
 
@@ -327,14 +396,14 @@ def process_all_videos(video_ids):
     for video_id in video_ids:
         try:
             video_dir = Path.cwd() / 'data' / 'user_videos' / video_id
-            transcript_file = video_dir / 'transcript.vtt'
+            transcript_file = video_dir / 'transcript.txt'
             
             if not transcript_file.exists():
                 print(f"Transcript file not found for video {video_id}")
                 continue
                 
             with open(transcript_file, 'r', encoding='utf-8') as f:
-                data = f.read().replace("\n", " ")
+                data = f.read()
                 chunks = [data[i:i+500] for i in range(0, len(data), 500)]
                 
                 for chunk in chunks:
@@ -382,3 +451,15 @@ def search_combined_embeddings(query):
     # Sort by score and return top matches
     best_matches.sort(key=lambda x: x['score'], reverse=True)
     return best_matches[:5]  # Return top 5 matches
+
+def init_lecture_embeddings():
+    print("\n=== Initializing CS410 Lecture Embeddings ===")
+    embeddings_dir = Path.cwd() / 'data' / 'embeddings'
+    combined_file = embeddings_dir / 'combined_embeddings.jsonl'
+    
+    if combined_file.exists():
+        print("Embeddings file already exists, skipping initialization")
+        return True
+        
+    embeddings_dir.mkdir(exist_ok=True)
+    
