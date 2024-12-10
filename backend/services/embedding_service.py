@@ -463,13 +463,21 @@ def search_combined_embeddings(query):
     return best_matches[:5]  # Return top 5 matches
 
 def init_lecture_embeddings():
-    print("\n=== Initializing CS410 Lecture Embeddings ===")
-    embeddings_dir = Path.cwd() / 'data' / 'embeddings'
-    combined_file = embeddings_dir / 'combined_embeddings.jsonl'
+    print(f"Current working directory: {Path.cwd()}")
     
-    if combined_file.exists():
-        print("Embeddings file already exists, skipping initialization")
-        return True
-        
-    embeddings_dir.mkdir(exist_ok=True)
+    # Use environment variables for paths, matching setup_directories()
+    base_dir = Path(os.environ.get('RENDER_PROJECT_DIR', Path.cwd()))
+    embeddings_dir = Path(os.environ.get('DATA_DIR', base_dir / 'data' / 'embeddings'))
+    transcript_dir = Path(os.environ.get('TXT_DIRECTORY', base_dir / 'CS410Transcripts' / 'txt'))
     
+    print(f"Using base directory: {base_dir}")
+
+    print(f"Using embeddings directory: {embeddings_dir}")
+    print(f"Using transcript directory: {transcript_dir}")
+    
+    # Ensure directory exists
+    embeddings_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Initialize embeddings
+    initialize_embeddings()
+

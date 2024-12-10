@@ -27,6 +27,11 @@ def setup_directories():
 def create_app():
     try:
         print("Starting app creation...")
+        print(f"Current working directory: {Path.cwd()}")
+        print(f"PYTHONPATH: {os.environ.get('PYTHONPATH')}")
+        print(f"RENDER_PROJECT_DIR: {os.environ.get('RENDER_PROJECT_DIR')}")
+        print(f"DATA_DIR: {os.environ.get('DATA_DIR')}")
+        
         app = Flask(__name__)
         
         print("Setting up directories...")
