@@ -10,14 +10,13 @@ services:
         python -m pip install --upgrade pip || true
         pip install -r requirements.txt || { echo "Failed to install requirements"; exit 1; }
         echo "=== Creating Directories ===" || true
-        mkdir -p /opt/render/project/src/data/embeddings || true
-        mkdir -p /opt/render/project/src/data/CS410Transcripts/vtt || true
-        mkdir -p /opt/render/project/src/data/CS410Transcripts/txt || true
+        mkdir -p /opt/render/project/src/data/embeddings || { echo "Failed to create embeddings directory"; exit 1; }
+        mkdir -p /opt/render/project/src/data/CS410Transcripts/vtt || { echo "Failed to create vtt directory"; exit 1; }
+        mkdir -p /opt/render/project/src/data/CS410Transcripts/txt || { echo "Failed to create txt directory"; exit 1; }
         echo "=== Copying Files ===" || true
         cp -rv backend/* /opt/render/project/src/ || { echo "Failed to copy backend files: $?"; exit 1; }
-        cp -rv data/embeddings/* /opt/render/project/src/data/embeddings/ || true
-        cp -rv CS410Transcripts/vtt/* /opt/render/project/src/data/CS410Transcripts/vtt/ || true
-        cp -rv CS410Transcripts/txt/* /opt/render/project/src/data/CS410Transcripts/txt/ || true
+        echo "=== Verifying Directory Structure ===" || true
+        ls -la /opt/render/project/src/data || { echo "Data directory missing"; exit 1; }
         echo "=== Verifying Setup ===" || true
         cd /opt/render/project/src && PYTHONPATH=/opt/render/project/src python -c "from app import create_app; print('Importing app...'); app=create_app(); print('App created successfully')" || { echo "Failed to create app: $?"; exit 1; }
       } 2>&1 | tee /opt/render/project/src/build.log
