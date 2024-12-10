@@ -10,27 +10,27 @@ services:
         python -m pip install --upgrade pip || true
         pip install -r requirements.txt || { echo "Failed to install requirements"; exit 1; }
         echo "=== Creating Directories ===" || true
-        mkdir -p /opt/render/project/src/backend/data/embeddings || true
-        mkdir -p /opt/render/project/src/backend/data/CS410Transcripts/vtt || true
+        mkdir -p /opt/render/project/src/data/embeddings || true
+        mkdir -p /opt/render/project/src/data/CS410Transcripts/vtt || true
         echo "=== Copying Files ===" || true
-        cp -rv * /opt/render/project/src/backend/ 2>&1 || { echo "Failed to copy files: $?"; exit 1; }
+        cp -rv * /opt/render/project/src/ 2>&1 || { echo "Failed to copy files: $?"; exit 1; }
         echo "=== Verifying Setup ===" || true
-        PYTHONPATH=/opt/render/project/src/backend python -c "from app import create_app; print('Importing app...'); app=create_app(); print('App created successfully')" 2>&1 || { echo "Failed to create app: $?"; exit 1; }
+        PYTHONPATH=/opt/render/project/src python -c "from app import create_app; print('Importing app...'); app=create_app(); print('App created successfully')" 2>&1 || { echo "Failed to create app: $?"; exit 1; }
       } 2>&1 | tee /opt/render/project/src/build.log
     startCommand: |
       {
         echo "Starting application..." || true
-        cd /opt/render/project/src/backend && PYTHONPATH=/opt/render/project/src/backend gunicorn --workers 4 --timeout 120 'app:create_app()' --log-level debug --capture-output --enable-stdio-inheritance
+        cd /opt/render/project/src && PYTHONPATH=/opt/render/project/src gunicorn --workers 4 --timeout 120 'app:create_app()' --log-level debug --capture-output --enable-stdio-inheritance
       } 2>&1 | tee /opt/render/project/src/start.log
     envVars:
       - key: PYTHONPATH
-        value: /opt/render/project/src/backend
+        value: /opt/render/project/src
       - key: DATA_DIR
-        value: /opt/render/project/src/backend/data/embeddings
+        value: /opt/render/project/src/data/embeddings
       - key: VTT_DIRECTORY
-        value: /opt/render/project/src/backend/data/CS410Transcripts/vtt
+        value: /opt/render/project/src/data/CS410Transcripts/vtt
       - key: TXT_DIRECTORY
-        value: /opt/render/project/src/backend/data/CS410Transcripts/txt
+        value: /opt/render/project/src/data/CS410Transcripts/txt
     healthCheckPath: /api/health
     autoDeploy: true
     disk:
