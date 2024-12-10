@@ -3,14 +3,26 @@ services:
     name: lecture-helper-backend
     env: python
     buildCommand: |
+      echo "=== Starting Build Process ==="
+      echo "Python version:"
+      python --version
+      echo "Current directory:"
+      pwd
+      echo "Directory contents:"
+      ls -la
+      echo "=== Installing Dependencies ==="
       python -m pip install --upgrade pip
-      pip install -r requirements.txt
+      pip install -r requirements.txt || exit 1
+      echo "=== Creating Directories ==="
       mkdir -p /opt/render/project/src/data/embeddings
       mkdir -p /opt/render/project/src/data/CS410Transcripts/vtt
-      cp -r backend/* /opt/render/project/src/
-      cp -r CS410Transcripts/vtt/* /opt/render/project/src/data/CS410Transcripts/vtt/
-      cp -r data/embeddings/* /opt/render/project/src/data/embeddings/
-    startCommand: gunicorn 'app:create_app()'
+      echo "=== Copying Files ==="
+      cp -rv backend/* /opt/render/project/src/ || exit 1
+      cp -rv CS410Transcripts/vtt/* /opt/render/project/src/data/CS410Transcripts/vtt/ || exit 1
+      cp -rv data/embeddings/* /opt/render/project/src/data/embeddings/ || exit 1
+      echo "=== Verifying Setup ==="
+      python -c "from app import create_app; app=create_app()" || exit 1
+    startCommand: gunicorn 'app:create_app()' --log-level debug
     envVars:
       - key: OPEN_AI_API_KEY
         sync: false
@@ -18,13 +30,18 @@ services:
         value: 3.9.0
       - key: PYTHONPATH
         value: /opt/render/project/src
+      - key: DATA_DIR
+        value: /opt/render/project/src/data/embeddings
+      - key: VTT_DIRECTORY
+        value: /opt/render/project/src/data/CS410Transcripts/vtt
+      - key: TXT_DIRECTORY
+        value: /opt/render/project/src/data/CS410Transcripts/txt
     healthCheckPath: /api/health
     autoDeploy: true
     disk:
       name: data
       mountPath: /opt/render/project/src/data
       sizeGB: 1
-
     buildFilter:
       paths:
         - backend/**
