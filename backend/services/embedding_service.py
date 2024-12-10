@@ -10,7 +10,12 @@ from typing import List
 
 load_dotenv()
 
-client = OpenAI(api_key=os.environ["OPEN_AI_API_KEY"])
+# Updated OpenAI client initialization
+try:
+    client = OpenAI(api_key=os.getenv("OPEN_AI_API_KEY"))
+except Exception as e:
+    print(f"Error initializing OpenAI client: {e}")
+    client = None
 
 def sliding_window_vtt(best_chunk, vtt_directory):
     # Normalize the search text
