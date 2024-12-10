@@ -60,3 +60,5 @@ coverage.xml
 # Distribution
 build/
 dist/ 
+
+!requirements.txt
