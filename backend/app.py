@@ -26,21 +26,21 @@ def setup_directories():
 
 def create_app():
     try:
+        print("Starting app creation...")
         app = Flask(__name__)
         
-        # Setup required directories and check files
+        print("Setting up directories...")
         if not setup_directories():
             print("Failed to initialize required directories and files")
             raise RuntimeError("Directory setup failed")
         
         print("Directories initialized successfully")
         
-        # Initialize embeddings before registering routes
         print("Initializing lecture embeddings...")
         init_lecture_embeddings()
         print("Embeddings initialized successfully")
         
-        # Register blueprints
+        print("Registering blueprints...")
         app.register_blueprint(video_routes)
         app.register_blueprint(api_routes)
         
@@ -48,9 +48,12 @@ def create_app():
         def health_check():
             return jsonify({"status": "healthy"}), 200
         
+        print("App creation completed successfully")
         return app
     except Exception as e:
-        print(f"Application initialization failed: {str(e)}")
+        print(f"Error creating app: {str(e)}")
+        import traceback
+        traceback.print_exc()
         raise
 
 if __name__ == '__main__':

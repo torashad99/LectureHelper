@@ -3,35 +3,39 @@ services:
     name: lecture-helper-backend
     env: python
     buildCommand: |
-      echo "=== Starting Build Process ==="
-      echo "Python version:"
-      python --version
-      echo "Current directory:"
-      pwd
-      echo "Directory contents:"
-      ls -la
-      echo "=== Installing Dependencies ==="
-      python -m pip install --upgrade pip
-      pip install -r requirements.txt || { echo "Failed to install requirements"; exit 1; }
-      echo "=== Creating Directories ==="
-      mkdir -p /opt/render/project/src/data/embeddings
-      mkdir -p /opt/render/project/src/data/CS410Transcripts/vtt
-      echo "=== Directory Creation Status ==="
-      ls -la /opt/render/project/src/
-      echo "=== Copying Files ==="
-      cp -rv * /opt/render/project/src/ || { echo "Failed to copy files"; exit 1; }
-      echo "=== Final Directory Structure ==="
-      ls -la /opt/render/project/src/
-      echo "=== Verifying Setup ==="
-      PYTHONPATH=/opt/render/project/src python -c "from app import create_app; app=create_app()" || { echo "Failed to create app"; exit 1; }
+      {
+        echo "=== Starting Build Process ===" || true
+        echo "Python version:" || true
+        python --version || true
+        echo "Current directory:" || true
+        pwd || true
+        echo "Directory contents:" || true
+        ls -la || true
+        echo "=== Installing Dependencies ===" || true
+        python -m pip install --upgrade pip || true
+        pip install -r requirements.txt || { echo "Failed to install requirements"; exit 1; }
+        echo "=== Creating Directories ===" || true
+        mkdir -p /opt/render/project/src/data/embeddings || true
+        mkdir -p /opt/render/project/src/data/CS410Transcripts/vtt || true
+        echo "=== Directory Creation Status ===" || true
+        ls -la /opt/render/project/src/ || true
+        echo "=== Copying Files ===" || true
+        cp -rv * /opt/render/project/src/ 2>&1 || { echo "Failed to copy files: $?"; exit 1; }
+        echo "=== Final Directory Structure ===" || true
+        ls -la /opt/render/project/src/ || true
+        echo "=== Verifying Setup ===" || true
+        PYTHONPATH=/opt/render/project/src python -c "from app import create_app; print('Importing app...'); app=create_app(); print('App created successfully')" 2>&1 || { echo "Failed to create app: $?"; exit 1; }
+      } 2>&1 | tee /opt/render/project/src/build.log
     startCommand: |
-      echo "Starting application..."
-      python -c "import sys; print(f'Python version: {sys.version}')"
-      echo "Environment variables set:"
-      env | grep -v "KEY"
-      echo "Current directory structure:"
-      ls -R /opt/render/project/src/
-      PYTHONPATH=/opt/render/project/src gunicorn --workers 4 --timeout 120 'app:create_app()' --log-level debug --capture-output --enable-stdio-inheritance
+      {
+        echo "Starting application..." || true
+        python -c "import sys; print(f'Python version: {sys.version}')" || true
+        echo "Environment variables set:" || true
+        env | grep -v "KEY" || true
+        echo "Current directory structure:" || true
+        ls -R /opt/render/project/src/ || true
+        PYTHONPATH=/opt/render/project/src gunicorn --workers 4 --timeout 120 'app:create_app()' --log-level debug --capture-output --enable-stdio-inheritance
+      } 2>&1 | tee /opt/render/project/src/start.log
     envVars:
       - key: OPEN_AI_API_KEY
         sync: false
