@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from routes.video_routes import video_routes
 from routes.api import api_routes
 from services.embedding_service import init_lecture_embeddings
@@ -45,6 +45,10 @@ def create_app():
     # Register blueprints
     app.register_blueprint(video_routes)
     app.register_blueprint(api_routes)
+    
+    @app.route('/api/health')
+    def health_check():
+        return jsonify({"status": "healthy"}), 200
     
     return app
 
