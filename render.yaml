@@ -3,16 +3,21 @@ services:
     name: lecture-helper-backend
     env: python
     buildCommand: |
+      python -m pip install --upgrade pip
       pip install -r requirements.txt
       mkdir -p /opt/render/project/src/data/embeddings
-      cp -r CS410Transcripts /opt/render/project/src/data/
+      mkdir -p /opt/render/project/src/data/CS410Transcripts/vtt
+      cp -r backend/* /opt/render/project/src/
+      cp -r CS410Transcripts/vtt/* /opt/render/project/src/data/CS410Transcripts/vtt/
       cp -r data/embeddings/* /opt/render/project/src/data/embeddings/
-    startCommand: gunicorn app:app
+    startCommand: gunicorn 'app:create_app()'
     envVars:
       - key: OPEN_AI_API_KEY
         sync: false
       - key: PYTHON_VERSION
         value: 3.9.0
+      - key: PYTHONPATH
+        value: /opt/render/project/src
     healthCheckPath: /api/health
     autoDeploy: true
     disk:
