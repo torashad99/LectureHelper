@@ -3,3 +3,7 @@ google-generativeai
 numpy
 openai
 python-dotenv
+flask==3.0.0
+flask-cors==4.0.0
+webvtt-py==0.4.6
+gunicorn==21.2.0
