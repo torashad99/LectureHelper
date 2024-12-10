@@ -7,28 +7,22 @@ import shutil
 import os
 
 def setup_directories():
-    # Create required directories
-    base_dir = Path.cwd()
-    data_dir = base_dir / 'data' / 'embeddings'
-    transcript_dir = base_dir / 'CS410Transcripts' / 'txt'
-    vtt_dir = base_dir / 'CS410Transcripts' / 'vtt'
+    # Use environment variables for paths
+    base_dir = Path(os.environ.get('RENDER_PROJECT_DIR', Path.cwd()))
+    data_dir = Path(os.environ.get('DATA_DIR', base_dir / 'data' / 'embeddings'))
+    transcript_dir = Path(os.environ.get('TXT_DIRECTORY', base_dir / 'CS410Transcripts' / 'txt'))
+    vtt_dir = Path(os.environ.get('VTT_DIRECTORY', base_dir / 'CS410Transcripts' / 'vtt'))
     
-    data_dir.mkdir(parents=True, exist_ok=True)
-    transcript_dir.mkdir(parents=True, exist_ok=True)
-    vtt_dir.mkdir(parents=True, exist_ok=True)
-    
-    # Check if transcript files exist
-    if not any(transcript_dir.glob('L*.txt')):
-        print("Error: No lecture transcripts found in CS410Transcripts/txt")
-        print("Please ensure L1.txt through L4.txt exist in the directory")
-        return False
+    for directory in [data_dir, transcript_dir, vtt_dir]:
+        directory.mkdir(parents=True, exist_ok=True)
         
-    if not any(vtt_dir.glob('L*.vtt')):
-        print("Error: No VTT files found in CS410Transcripts/vtt")
-        print("Please ensure L1.vtt through L4.vtt exist in the directory")
-        return False
+    # Add logging for debugging
+    print(f"Checking directories:")
+    print(f"Data dir: {data_dir} - exists: {data_dir.exists()}")
+    print(f"Transcript dir: {transcript_dir} - exists: {transcript_dir.exists()}")
+    print(f"VTT dir: {vtt_dir} - exists: {vtt_dir.exists()}")
     
-    return True
+    return all(d.exists() for d in [data_dir, transcript_dir, vtt_dir])
 
 def create_app():
     app = Flask(__name__)
