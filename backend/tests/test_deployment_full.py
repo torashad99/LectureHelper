@@ -3,15 +3,14 @@ from pathlib import Path
 import os
 import shutil
 import subprocess
-import json
-from dotenv import load_dotenv
 import sys
+import json
 
 class TestFullDeployment(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Install required packages
-        subprocess.run([sys.executable, "-m", "pip", "install", "gunicorn"], check=True)
+        subprocess.run([sys.executable, "-m", "pip", "install", "gunicorn", "flask", "openai"], check=True)
     
     def setUp(self):
         # Create test environment structure
@@ -22,11 +21,32 @@ class TestFullDeployment(unittest.TestCase):
         self.vtt_dir = self.data_dir / 'CS410Transcripts' / 'vtt'
         self.txt_dir = self.data_dir / 'CS410Transcripts' / 'txt'
         
-        # Create all directories
+        # Create all directories including parent directories
         for dir_path in [self.embeddings_dir, self.vtt_dir, self.txt_dir]:
             dir_path.mkdir(parents=True, exist_ok=True)
             
-        # Set environment variables
+        # Create test embeddings file
+        embeddings_file = self.embeddings_dir / 'embeddings.jsonl'
+        test_embedding = {
+            "text": "test chunk",
+            "embedding": [0.1] * 10,
+            "timestamp": "00:00:00.000",
+            "video_id": "L1"
+        }
+        with open(embeddings_file, 'w') as f:
+            f.write(json.dumps(test_embedding))
+            
+        # Copy necessary files before setting environment variables
+        source_dir = Path.cwd()
+        for item in ['app.py', 'config.py', 'routes', 'services']:
+            source_path = source_dir / item
+            dest_path = self.project_dir / item
+            if source_path.is_file():
+                shutil.copy2(source_path, dest_path)
+            elif source_path.is_dir():
+                shutil.copytree(source_path, dest_path, dirs_exist_ok=True)
+        
+        # Set environment variables after files are copied
         os.environ.update({
             'PYTHONPATH': str(self.project_dir),
             'RENDER_PROJECT_DIR': str(self.project_dir),
@@ -69,9 +89,14 @@ Test content for lecture {i}"""
         
     def test_3_app_creation(self):
         """Test that the Flask app can be created"""
-        cmd = f"PYTHONPATH={self.project_dir} {sys.executable} -c 'from app import create_app; app=create_app()'"
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-        self.assertEqual(result.returncode, 0, f"App creation failed: {result.stderr}")
+        try:
+            import sys
+            sys.path.insert(0, str(self.project_dir))
+            from app import create_app
+            app = create_app()
+            self.assertIsNotNone(app)
+        except Exception as e:
+            self.fail(f"App creation failed: {str(e)}")
         
     def test_4_gunicorn_startup(self):
         """Test that gunicorn can start the app"""
@@ -79,8 +104,9 @@ Test content for lecture {i}"""
         if not gunicorn_path:
             self.skipTest("Gunicorn not installed")
             
-        cmd = f"PYTHONPATH={self.project_dir} {gunicorn_path} --check-config 'app:create_app()'"
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+        os.chdir(self.project_dir)  # Change to project directory before running gunicorn
+        cmd = [gunicorn_path, '--check-config', 'app:create_app()']
+        result = subprocess.run(cmd, capture_output=True, text=True, env=os.environ)
         self.assertEqual(result.returncode, 0, f"Gunicorn config check failed: {result.stderr}")
 
     def tearDown(self):
