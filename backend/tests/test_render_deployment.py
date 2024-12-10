@@ -11,11 +11,34 @@ class TestRenderDeployment(unittest.TestCase):
         self.test_dir = Path.cwd() / 'test_render'
         self.project_dir = self.test_dir / 'opt' / 'render' / 'project' / 'src'
         
-        # Create directories
+        # Create base directories
         self.project_dir.mkdir(parents=True, exist_ok=True)
         
+        # Create data directories
+        data_dir = self.project_dir / 'data'
+        embeddings_dir = data_dir / 'embeddings'
+        vtt_dir = data_dir / 'CS410Transcripts' / 'vtt'
+        txt_dir = data_dir / 'CS410Transcripts' / 'txt'
+        
+        for dir_path in [embeddings_dir, vtt_dir, txt_dir]:
+            dir_path.mkdir(parents=True, exist_ok=True)
+        
         # Set environment variables
-        os.environ['PYTHONPATH'] = str(self.project_dir)
+        os.environ.update({
+            'PYTHONPATH': str(self.project_dir),
+            'RENDER_PROJECT_DIR': str(self.project_dir),
+            'DATA_DIR': str(embeddings_dir),
+            'VTT_DIRECTORY': str(vtt_dir),
+            'TXT_DIRECTORY': str(txt_dir)
+        })
+        
+        # Copy necessary files
+        source_dir = Path.cwd()
+        for item in ['app.py', 'config.py', 'routes', 'services']:
+            if (source_dir / item).is_file():
+                shutil.copy2(source_dir / item, self.project_dir)
+            elif (source_dir / item).is_dir():
+                shutil.copytree(source_dir / item, self.project_dir / item, dirs_exist_ok=True)
         
     def tearDown(self):
         if self.test_dir.exists():

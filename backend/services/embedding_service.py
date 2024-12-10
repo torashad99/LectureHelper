@@ -152,15 +152,20 @@ def process_user_query(query, video_id):
     }
 
 def initialize_embeddings():
-    transcript_dir = "CS410Transcripts/txt"  # Adjust this path as needed
-    output_file = "embeddings.jsonl"
+    base_dir = Path(os.environ.get('RENDER_PROJECT_DIR', Path.cwd()))
+    transcript_dir = Path(os.environ.get('TXT_DIRECTORY', base_dir / 'CS410Transcripts' / 'txt'))
+    embeddings_dir = Path(os.environ.get('DATA_DIR', base_dir / 'data' / 'embeddings'))
+    output_file = embeddings_dir / 'embeddings.jsonl'
     
-    if not os.path.exists(output_file):
-        print("Creating embeddings file...")
+    # Ensure directory exists
+    embeddings_dir.mkdir(parents=True, exist_ok=True)
+    
+    if not output_file.exists():
+        print(f"Creating embeddings file at {output_file}...")
         num_embeddings = create_embeddings_file(transcript_dir, output_file)
         print(f"Created {num_embeddings} embeddings")
     else:
-        print("Embeddings file already exists")
+        print(f"Embeddings file already exists at {output_file}")
 
 def process_transcript(video_id):
     try:
