@@ -2,7 +2,7 @@ services:
   - type: web
     name: lecture-helper-backend
     env: python
-        buildCommand: |
+    buildCommand: |
       echo "=== Starting Build Process ==="
       echo "Python version:"
       python --version
@@ -12,29 +12,31 @@ services:
       ls -la
       echo "=== Installing Dependencies ==="
       python -m pip install --upgrade pip
-      pip install -r requirements.txt || exit 1
+      pip install -r requirements.txt || { echo "Failed to install requirements"; exit 1; }
       echo "=== Creating Directories ==="
       mkdir -p /opt/render/project/src/data/embeddings
       mkdir -p /opt/render/project/src/data/CS410Transcripts/vtt
+      echo "=== Directory Creation Status ==="
+      ls -la /opt/render/project/src/
       echo "=== Copying Files ==="
-      cp -rv backend/* /opt/render/project/src/ || exit 1
-      cp -rv CS410Transcripts/vtt/* /opt/render/project/src/data/CS410Transcripts/vtt/ || exit 1
-      cp -rv data/embeddings/* /opt/render/project/src/data/embeddings/ || exit 1
+      cp -rv * /opt/render/project/src/ || { echo "Failed to copy files"; exit 1; }
+      echo "=== Final Directory Structure ==="
+      ls -la /opt/render/project/src/
       echo "=== Verifying Setup ==="
-      python -c "from app import create_app; app=create_app()" || exit 1
+      PYTHONPATH=/opt/render/project/src python -c "from app import create_app; app=create_app()" || { echo "Failed to create app"; exit 1; }
     startCommand: |
-        echo "Starting application..."
-        python -c "import sys; print(f'Python version: {sys.version}')"
-        echo "Environment variables set:"
-        env | grep -v "KEY"
-        echo "Current directory structure:"
-        ls -R /opt/render/project/src/
-        gunicorn 'app:create_app()' --log-level debug --capture-output --enable-stdio-inheritance
+      echo "Starting application..."
+      python -c "import sys; print(f'Python version: {sys.version}')"
+      echo "Environment variables set:"
+      env | grep -v "KEY"
+      echo "Current directory structure:"
+      ls -R /opt/render/project/src/
+      PYTHONPATH=/opt/render/project/src gunicorn --workers 4 --timeout 120 'app:create_app()' --log-level debug --capture-output --enable-stdio-inheritance
     envVars:
       - key: OPEN_AI_API_KEY
         sync: false
       - key: PYTHON_VERSION
-        value: 3.9.0
+        value: 3.11.10
       - key: PYTHONPATH
         value: /opt/render/project/src
       - key: DATA_DIR
@@ -43,6 +45,8 @@ services:
         value: /opt/render/project/src/data/CS410Transcripts/vtt
       - key: TXT_DIRECTORY
         value: /opt/render/project/src/data/CS410Transcripts/txt
+      - key: RENDER_PROJECT_DIR
+        value: /opt/render/project/src
     healthCheckPath: /api/health
     autoDeploy: true
     disk:
