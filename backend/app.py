@@ -25,26 +25,33 @@ def setup_directories():
     return all(d.exists() for d in [data_dir, transcript_dir, vtt_dir])
 
 def create_app():
-    app = Flask(__name__)
-    
-    # Setup required directories and check files
-    if not setup_directories():
-        print("Failed to initialize required directories and files")
-        exit(1)
-    
-    # Initialize embeddings before registering routes
-    print("Initializing lecture embeddings...")
-    init_lecture_embeddings()
-    
-    # Register blueprints
-    app.register_blueprint(video_routes)
-    app.register_blueprint(api_routes)
-    
-    @app.route('/api/health')
-    def health_check():
-        return jsonify({"status": "healthy"}), 200
-    
-    return app
+    try:
+        app = Flask(__name__)
+        
+        # Setup required directories and check files
+        if not setup_directories():
+            print("Failed to initialize required directories and files")
+            raise RuntimeError("Directory setup failed")
+        
+        print("Directories initialized successfully")
+        
+        # Initialize embeddings before registering routes
+        print("Initializing lecture embeddings...")
+        init_lecture_embeddings()
+        print("Embeddings initialized successfully")
+        
+        # Register blueprints
+        app.register_blueprint(video_routes)
+        app.register_blueprint(api_routes)
+        
+        @app.route('/api/health')
+        def health_check():
+            return jsonify({"status": "healthy"}), 200
+        
+        return app
+    except Exception as e:
+        print(f"Application initialization failed: {str(e)}")
+        raise
 
 if __name__ == '__main__':
     app = create_app()

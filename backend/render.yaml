@@ -2,7 +2,7 @@ services:
   - type: web
     name: lecture-helper-backend
     env: python
-    buildCommand: |
+        buildCommand: |
       echo "=== Starting Build Process ==="
       echo "Python version:"
       python --version
@@ -22,7 +22,14 @@ services:
       cp -rv data/embeddings/* /opt/render/project/src/data/embeddings/ || exit 1
       echo "=== Verifying Setup ==="
       python -c "from app import create_app; app=create_app()" || exit 1
-    startCommand: gunicorn 'app:create_app()' --log-level debug
+    startCommand: |
+        echo "Starting application..."
+        python -c "import sys; print(f'Python version: {sys.version}')"
+        echo "Environment variables set:"
+        env | grep -v "KEY"
+        echo "Current directory structure:"
+        ls -R /opt/render/project/src/
+        gunicorn 'app:create_app()' --log-level debug --capture-output --enable-stdio-inheritance
     envVars:
       - key: OPEN_AI_API_KEY
         sync: false
