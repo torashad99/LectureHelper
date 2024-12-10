@@ -12,10 +12,14 @@ services:
         echo "=== Creating Directories ===" || true
         mkdir -p /opt/render/project/src/data/embeddings || true
         mkdir -p /opt/render/project/src/data/CS410Transcripts/vtt || true
+        mkdir -p /opt/render/project/src/data/CS410Transcripts/txt || true
         echo "=== Copying Files ===" || true
-        cp -rv * /opt/render/project/src/ 2>&1 || { echo "Failed to copy files: $?"; exit 1; }
+        cp -rv backend/* /opt/render/project/src/ || { echo "Failed to copy backend files: $?"; exit 1; }
+        cp -rv data/embeddings/* /opt/render/project/src/data/embeddings/ || true
+        cp -rv CS410Transcripts/vtt/* /opt/render/project/src/data/CS410Transcripts/vtt/ || true
+        cp -rv CS410Transcripts/txt/* /opt/render/project/src/data/CS410Transcripts/txt/ || true
         echo "=== Verifying Setup ===" || true
-        PYTHONPATH=/opt/render/project/src python -c "from app import create_app; print('Importing app...'); app=create_app(); print('App created successfully')" 2>&1 || { echo "Failed to create app: $?"; exit 1; }
+        cd /opt/render/project/src && PYTHONPATH=/opt/render/project/src python -c "from app import create_app; print('Importing app...'); app=create_app(); print('App created successfully')" || { echo "Failed to create app: $?"; exit 1; }
       } 2>&1 | tee /opt/render/project/src/build.log
     startCommand: |
       {
