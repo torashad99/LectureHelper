@@ -14,8 +14,9 @@ class TestFullDeployment(unittest.TestCase):
     
     def setUp(self):
         # Create test environment structure
-        self.test_dir = Path.cwd() / 'test_render'
+        self.test_dir = Path.cwd()
         self.project_dir = self.test_dir / 'opt' / 'render' / 'project' / 'src'
+        self.backend_dir = self.project_dir / 'backend'
         self.data_dir = self.project_dir / 'data'
         self.embeddings_dir = self.data_dir / 'embeddings'
         self.vtt_dir = self.data_dir / 'CS410Transcripts' / 'vtt'
@@ -36,17 +37,23 @@ class TestFullDeployment(unittest.TestCase):
         with open(embeddings_file, 'w') as f:
             f.write(json.dumps(test_embedding))
             
-        # Copy necessary files before setting environment variables
+        # Copy files to both project and backend directories
         source_dir = Path.cwd()
         for item in ['app.py', 'config.py', 'routes', 'services']:
-            source_path = source_dir / item
-            dest_path = self.project_dir / item
-            if source_path.is_file():
-                shutil.copy2(source_path, dest_path)
-            elif source_path.is_dir():
-                shutil.copytree(source_path, dest_path, dirs_exist_ok=True)
+            # Copy to project dir
+            if (source_dir / item).is_file():
+                shutil.copy2(source_dir / item, self.project_dir)
+            elif (source_dir / item).is_dir():
+                shutil.copytree(source_dir / item, self.project_dir / item, dirs_exist_ok=True)
+                
+            # Copy to backend dir
+            self.backend_dir.mkdir(parents=True, exist_ok=True)
+            if (source_dir / item).is_file():
+                shutil.copy2(source_dir / item, self.backend_dir)
+            elif (source_dir / item).is_dir():
+                shutil.copytree(source_dir / item, self.backend_dir / item, dirs_exist_ok=True)
         
-        # Set environment variables after files are copied
+        # Set environment variables
         os.environ.update({
             'PYTHONPATH': str(self.project_dir),
             'RENDER_PROJECT_DIR': str(self.project_dir),
@@ -56,7 +63,6 @@ class TestFullDeployment(unittest.TestCase):
             'OPEN_AI_API_KEY': 'test_key'
         })
         
-        # Create test data
         self._create_test_data()
         
     def _create_test_data(self):
@@ -90,8 +96,7 @@ Test content for lecture {i}"""
     def test_3_app_creation(self):
         """Test that the Flask app can be created"""
         try:
-            import sys
-            sys.path.insert(0, str(self.project_dir))
+            os.chdir(self.project_dir)  # Change to project directory
             from app import create_app
             app = create_app()
             self.assertIsNotNone(app)
@@ -104,14 +109,14 @@ Test content for lecture {i}"""
         if not gunicorn_path:
             self.skipTest("Gunicorn not installed")
             
-        os.chdir(self.project_dir)  # Change to project directory before running gunicorn
+        os.chdir(self.project_dir)  # Change to project directory
         cmd = [gunicorn_path, '--check-config', 'app:create_app()']
         result = subprocess.run(cmd, capture_output=True, text=True, env=os.environ)
         self.assertEqual(result.returncode, 0, f"Gunicorn config check failed: {result.stderr}")
 
     def tearDown(self):
         if self.test_dir.exists():
-            shutil.rmtree(self.test_dir)
+            shutil.rmtree(self.test_dir / 'opt')
 
 if __name__ == '__main__':
     unittest.main(verbosity=2) 
