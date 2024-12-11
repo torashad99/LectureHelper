@@ -1,7 +1,9 @@
 *.env
 *.vsix
-*.txt:Zone.Identifier
-*.vtt:Zone.Identifier
 demo/
+
+!CS410Transcripts/
+!CS410Transcripts/vtt/
+!CS410Transcripts/vtt/*.vtt
 
 !requirements.txt

@@ -22,3 +22,14 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .vercel
+
+
+
+!CS410Transcripts/
+!CS410Transcripts/vtt/
+!CS410Transcripts/vtt/*.vtt
+
+
+!CS410Transcripts/
+!CS410Transcripts/txt/
+!CS410Transcripts/txt/*.txt

@@ -1,0 +1,49 @@
+services:
+  - type: web
+    name: lecture-helper-backend
+    env: python
+    buildCommand: |
+      {
+        echo "=== Starting Build Process ==="
+        python -m pip install --upgrade pip
+        pip install -r backend/requirements.txt || { echo "Failed to install requirements"; exit 1; }
+
+        echo "=== Creating Directories ==="
+        mkdir -p /opt/render/project/src/data/embeddings || { echo "Failed to create embeddings directory"; exit 1; }
+        mkdir -p /opt/render/project/src/data/CS410Transcripts/vtt || { echo "Failed to create vtt directory"; exit 1; }
+
+        echo "=== Copying Files ==="
+        # Copy root-level backend files
+        cp -rv backend/app.py backend/config.py backend/requirements.txt /opt/render/project/src/ || { echo "Failed to copy root files"; exit 1; }
+
+        # Copy directories needed by your application
+        cp -rv backend/routes backend/services backend/utils /opt/render/project/src/ || { echo "Failed to copy routes/services/utils"; exit 1; }
+
+        # Copy CS410Transcripts directory (including vtt)
+        cp -rv backend/CS410Transcripts /opt/render/project/src/data/CS410Transcripts || { echo "Failed to copy CS410Transcripts"; exit 1; }
+
+        # Copy embeddings file
+        cp backend/data/embeddings/embeddings.jsonl /opt/render/project/src/data/embeddings/ || { echo "Failed to copy embeddings"; exit 1; }
+      } 2>&1 | tee /opt/render/project/src/build.log
+    startCommand: |
+      cd /opt/render/project/src && gunicorn --workers 4 --timeout 120 'app:create_app()' --log-level debug
+    envVars:
+      - key: PYTHONPATH
+        value: /opt/render/project/src
+      - key: DATA_DIR
+        value: /opt/render/project/src/data/embeddings
+      - key: VTT_DIRECTORY
+        value: /opt/render/project/src/data/CS410Transcripts/vtt
+      - key: OPENAI_API_KEY
+        sync: false
+    healthCheckPath: /api/health
+    autoDeploy: true
+    disk:
+      name: data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1
+    buildFilter:
+      paths:
+        - backend/**
+      ignoredPaths:
+        - frontend/**
