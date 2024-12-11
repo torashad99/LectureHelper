@@ -61,3 +61,12 @@ build/
 dist/ 
 
 !requirements.txt
+
+!CS410Transcripts/
+!CS410Transcripts/vtt/
+!CS410Transcripts/vtt/*.vtt
+
+
+!CS410Transcripts/
+!CS410Transcripts/txt/
+!CS410Transcripts/txt/*.txt
