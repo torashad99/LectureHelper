@@ -10,36 +10,25 @@ services:
         python -m pip install --upgrade pip || true
         pip install -r requirements.txt || { echo "Failed to install requirements"; exit 1; }
         echo "=== Creating Directories ===" || true
-        mkdir -p /opt/render/project/src/backend/data/embeddings || { echo "Failed to create embeddings directory"; exit 1; }
-        mkdir -p /opt/render/project/src/backend/data/CS410Transcripts/vtt || { echo "Failed to create vtt directory"; exit 1; }
-        mkdir -p /opt/render/project/src/backend/data/CS410Transcripts/txt || { echo "Failed to create txt directory"; exit 1; }
-        cp backend/data/embeddings/embeddings.jsonl /opt/render/project/src/backend/data/embeddings/ || { echo "Failed to copy embeddings file"; exit 1; }
+        mkdir -p /opt/render/project/src/data/embeddings || { echo "Failed to create embeddings directory"; exit 1; }
+        mkdir -p /opt/render/project/src/data/CS410Transcripts/vtt || { echo "Failed to create vtt directory"; exit 1; }
         echo "=== Copying Files ===" || true
-        cp -rv backend/* /opt/render/project/src/backend/ || { echo "Failed to copy backend files: $?"; exit 1; }
-        echo "=== Verifying Directory Structure ===" || true
-        ls -la /opt/render/project/src/backend/data || { echo "Data directory missing"; exit 1; }
-        echo "=== Verifying Setup ===" || true
-        cd /opt/render/project/src/backend && PYTHONPATH=/opt/render/project/src/backend python -c "from app import create_app; print('Importing app...'); app=create_app(); print('App created successfully')" || { echo "Failed to create app: $?"; exit 1; }
-      } 2>&1 | tee /opt/render/project/src/backend/build.log
+        cp data/embeddings/embeddings.jsonl /opt/render/project/src/data/embeddings/ || { echo "Failed to copy embeddings file"; exit 1; }
+        cp -rv * /opt/render/project/src/ || { echo "Failed to copy backend files: $?"; exit 1; }
+      } 2>&1 | tee /opt/render/project/src/build.log
     startCommand: |
-      {
-        echo "Starting application..." || true
-        cd /opt/render/project/src/backend && PYTHONPATH=/opt/render/project/src/backend gunicorn --workers 4 --timeout 120 'app:create_app()' --log-level debug --capture-output --enable-stdio-inheritance
-      } 2>&1 | tee /opt/render/project/src/backend/start.log
+      cd /opt/render/project/src && gunicorn 'app:create_app()' --log-level debug
     envVars:
       - key: PYTHONPATH
-        value: /opt/render/project/src/backend
+        value: /opt/render/project/src
       - key: DATA_DIR
-        value: /opt/render/project/src/backend/data/embeddings
-      - key: VTT_DIRECTORY
-        value: /opt/render/project/src/backend/data/CS410Transcripts/vtt
-      - key: TXT_DIRECTORY
-        value: /opt/render/project/src/backend/data/CS410Transcripts/txt
+        value: /opt/render/project/src/data/embeddings
+      - key: VTT_
     healthCheckPath: /api/health
     autoDeploy: true
     disk:
       name: data
-      mountPath: /opt/render/project/src/backend/data
+      mountPath: /opt/render/project/src/data
       sizeGB: 1
     buildFilter:
       paths:

@@ -48,11 +48,14 @@ def process_multiple_videos_query(query, video_ids):
     print("\n=== Starting Search Process ===")
     print(f"Looking for videos: {video_ids}")
     
-    # Use absolute paths for Render environment
+    # Use environment variables for paths
     base_dir = Path('/opt/render/project/src')
-    embeddings_file = base_dir / 'data' / 'embeddings' / 'embeddings.jsonl'
+    embeddings_dir = Path(os.environ.get('DATA_DIR', base_dir / 'data' / 'embeddings'))
+    vtt_dir = Path(os.environ.get('VTT_DIRECTORY', base_dir / 'data' / 'CS410Transcripts' / 'vtt'))
+    embeddings_file = embeddings_dir / 'embeddings.jsonl'
     
     print(f"Looking for embeddings file at: {embeddings_file}")
+    print(f"VTT directory at: {vtt_dir}")
     
     if not embeddings_file.exists():
         print(f"Embeddings file not found at {embeddings_file}")
@@ -64,25 +67,25 @@ def process_multiple_videos_query(query, video_ids):
     with open(embeddings_file, 'r') as f:
         for line in f:
             data = json.loads(line)
-            score = np.dot(data['embedding'], query_embedding)
-            if score > 0.5:
-                matches.append({
-                    "text": data['text'],
-                    "score": float(score)
-                })
+            if data.get('video_id') in video_ids:
+                score = np.dot(data['embedding'], query_embedding)
+                if score > 0.5:
+                    matches.append({
+                        "text": data['text'],
+                        "video_id": data['video_id'],
+                        "score": float(score)
+                    })
     
     # Sort by score
     matches.sort(key=lambda x: x['score'], reverse=True)
     
     # Process top matches
     results = []
-    vtt_dir = base_dir / 'CS410Transcripts' / 'vtt'
-    
     for match in matches[:5]:
         lecture_index, timestamp = sliding_window_vtt(match['text'], str(vtt_dir))
-        if lecture_index and timestamp and lecture_index in video_ids:
+        if lecture_index and timestamp:
             results.append({
-                "video_id": lecture_index,
+                "video_id": match['video_id'],
                 "response": match['text'],
                 "timestamp": timestamp,
                 "score": match['score']
