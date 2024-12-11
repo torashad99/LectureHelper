@@ -5,19 +5,23 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
+def create_app():
+    load_dotenv()
+    
+    # Initialize OpenAI client globally
+    try:
+        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    except Exception as e:
+        print(f"Error initializing OpenAI client: {e}")
+        client = None
 
-# Initialize OpenAI client globally
-try:
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-except Exception as e:
-    print(f"Error initializing OpenAI client: {e}")
-    client = None
-
-app = Flask(__name__)
-CORS(app)
-
-app.register_blueprint(api_routes, url_prefix='/api')
+    app = Flask(__name__)
+    CORS(app)
+    
+    app.register_blueprint(api_routes, url_prefix='/api')
+    
+    return app
 
 if __name__ == '__main__':
+    app = create_app()
     app.run(debug=True)
