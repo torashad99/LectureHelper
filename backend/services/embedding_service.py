@@ -46,9 +46,13 @@ def sliding_window_vtt(best_chunk, vtt_directory):
 
 def process_multiple_videos_query(query, video_ids):
     print("\n=== Starting Search Process ===")
-    base_dir = Path(os.environ.get('RENDER_PROJECT_DIR', Path.cwd()))
-    embeddings_dir = Path(os.environ.get('DATA_DIR', base_dir / 'data' / 'embeddings'))
-    embeddings_file = embeddings_dir / 'embeddings.jsonl'
+    print(f"Looking for videos: {video_ids}")
+    
+    # Use absolute paths for Render environment
+    base_dir = Path('/opt/render/project/src')
+    embeddings_file = base_dir / 'data' / 'embeddings' / 'embeddings.jsonl'
+    
+    print(f"Looking for embeddings file at: {embeddings_file}")
     
     if not embeddings_file.exists():
         print(f"Embeddings file not found at {embeddings_file}")
@@ -57,7 +61,6 @@ def process_multiple_videos_query(query, video_ids):
     query_embedding = get_embedding(query)
     matches = []
     
-    # Load embeddings and find matches
     with open(embeddings_file, 'r') as f:
         for line in f:
             data = json.loads(line)
@@ -71,9 +74,9 @@ def process_multiple_videos_query(query, video_ids):
     # Sort by score
     matches.sort(key=lambda x: x['score'], reverse=True)
     
-    # Process top matches to find timestamps
+    # Process top matches
     results = []
-    vtt_dir = Path.cwd() / 'CS410Transcripts' / 'vtt'
+    vtt_dir = base_dir / 'CS410Transcripts' / 'vtt'
     
     for match in matches[:5]:
         lecture_index, timestamp = sliding_window_vtt(match['text'], str(vtt_dir))
