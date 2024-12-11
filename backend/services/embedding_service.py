@@ -12,9 +12,17 @@ load_dotenv()
 
 # Updated OpenAI client initialization
 try:
-    client = OpenAI(api_key=os.getenv("OPEN_AI_API_KEY"))
+    print("Initializing OpenAI client...")
+    print(f"API Key present: {bool(os.getenv('OPEN_AI_API_KEY'))}")
+    
+    client = OpenAI(
+        api_key=os.getenv("OPEN_AI_API_KEY"),
+        base_url="https://api.openai.com/v1"
+    )
+    print("OpenAI client initialized successfully")
 except Exception as e:
     print(f"Error initializing OpenAI client: {e}")
+    print(f"Error type: {type(e)}")
     client = None
 
 def sliding_window_vtt(best_chunk, vtt_directory):
