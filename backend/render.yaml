@@ -13,6 +13,7 @@ services:
         mkdir -p /opt/render/project/src/backend/data/embeddings || { echo "Failed to create embeddings directory"; exit 1; }
         mkdir -p /opt/render/project/src/backend/data/CS410Transcripts/vtt || { echo "Failed to create vtt directory"; exit 1; }
         mkdir -p /opt/render/project/src/backend/data/CS410Transcripts/txt || { echo "Failed to create txt directory"; exit 1; }
+        cp backend/data/embeddings/embeddings.jsonl /opt/render/project/src/backend/data/embeddings/ || { echo "Failed to copy embeddings file"; exit 1; }
         echo "=== Copying Files ===" || true
         cp -rv backend/* /opt/render/project/src/backend/ || { echo "Failed to copy backend files: $?"; exit 1; }
         echo "=== Verifying Directory Structure ===" || true
