@@ -5,7 +5,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://lecturehelper.onrender.com/api/:path*"
+      "destination": "https://lecture-helper-backend-t30f.onrender.com/api/:path*"
     }
   ]
 } 
