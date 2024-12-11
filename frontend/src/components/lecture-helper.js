@@ -40,8 +40,8 @@ export default function LectureHelper() {
       if (response.ok && data.success && data.results) {
         const transformedResults = data.results.map(result => ({
           timestamp: result.timestamp,
-          title: result.title || `Lecture ${result.video_id.substring(1)}`,
-          videoId: result.video_id,
+          title: VIDEO_TITLES[result.lecture] || `Unknown Lecture`,
+          videoId: result.lecture,
           response: result.response
         }));
         console.log('Transformed results:', transformedResults);
