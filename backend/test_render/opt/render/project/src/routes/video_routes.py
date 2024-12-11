@@ -3,7 +3,7 @@ from config.video_config import VIDEO_MAPPINGS, VIDEO_TITLES
 
 video_routes = Blueprint('video_routes', __name__)
 
-@video_routes.route('/api/videos', methods=['GET'])
+@video_routes.route('/videos', methods=['GET'])
 def get_all_videos():
     try:
         videos = [

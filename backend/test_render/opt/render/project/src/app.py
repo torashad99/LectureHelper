@@ -1,7 +1,7 @@
 from flask import Flask, jsonify
-from routes.video_routes import video_routes
-from routes.api import api_routes
-from services.embedding_service import init_lecture_embeddings
+from .routes.video_routes import video_routes
+from .routes.api import api_routes
+from .services.embedding_service import init_lecture_embeddings
 from pathlib import Path
 import shutil
 import os
@@ -41,8 +41,8 @@ def create_app():
         print("Embeddings initialized successfully")
         
         print("Registering blueprints...")
-        app.register_blueprint(video_routes)
-        app.register_blueprint(api_routes)
+        app.register_blueprint(video_routes, url_prefix='/api')
+        app.register_blueprint(api_routes, url_prefix='/api')
         
         @app.route('/api/health')
         def health_check():

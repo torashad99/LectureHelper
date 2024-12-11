@@ -255,7 +255,17 @@ def process_video_query(query, video_id):
 def process_multiple_videos_query(query, video_ids):
     print("\n=== Starting Search Process ===")
     print(f"Looking for videos: {video_ids}")
-    embeddings_file = Path.cwd() / 'data' / 'embeddings' / 'combined_embeddings.jsonl'
+    
+    # Use environment variables for paths
+    base_dir = Path(os.environ.get('RENDER_PROJECT_DIR'))
+    embeddings_dir = Path(os.environ.get('DATA_DIR'))
+    embeddings_file = embeddings_dir / 'embeddings.jsonl'
+    
+    print(f"Looking for embeddings file at: {embeddings_file}")
+    
+    if not embeddings_file.exists():
+        print(f"Embeddings file not found at {embeddings_file}")
+        raise FileNotFoundError(f"Embeddings file not found at {embeddings_file}")
     
     # Load all embeddings first
     embeddings = {}
@@ -438,7 +448,7 @@ def process_all_videos(video_ids):
     return True
 
 def search_combined_embeddings(query):
-    embeddings_file = Path.cwd() / 'data' / 'embeddings' / 'combined_embeddings.jsonl'
+    embeddings_file = Path.cwd() / 'data' / 'embeddings' / 'embeddings.jsonl'
     
     if not embeddings_file.exists():
         return [], "Embeddings file not found"

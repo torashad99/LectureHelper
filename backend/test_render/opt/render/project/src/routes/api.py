@@ -1,19 +1,30 @@
 from flask import Blueprint, request, jsonify
-from services.embedding_service import process_all_videos, init_lecture_embeddings
+from services.embedding_service import process_multiple_videos_query
 
 api_routes = Blueprint('api_routes', __name__)
 
-@api_routes.route('/process-embeddings', methods=['POST'])
-def process_embeddings():
-    data = request.get_json()
-    video_ids = data.get('video_ids', [])
-    
-    if not video_ids:
-        return jsonify({'error': 'No video IDs provided'}), 400
-        
+@api_routes.route('/search', methods=['GET'])
+def search():
     try:
-        process_all_videos(video_ids)
-        return jsonify({'status': 'success'})
+        query = request.args.get('q')
+        video_ids = request.args.getlist('video_ids[]')
+        
+        if not query or not video_ids:
+            return jsonify({
+                'success': False,
+                'error': 'Missing query or video IDs'
+            }), 400
+            
+        matches = process_multiple_videos_query(query, video_ids)
+        
+        return jsonify({
+            'success': True,
+            'results': matches
+        })
+        
     except Exception as e:
-        return jsonify({'error': str(e)}), 500 
-
+        print(f"Search error: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
