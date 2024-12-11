@@ -95,16 +95,31 @@ def process_lecture_query(query):
     # Sort by score
     matches.sort(key=lambda x: x['score'], reverse=True)
     
+    system_prompt = "You are a friendly and supportive teaching assistant for a course on Text Information Systems."
+    
     # Process top matches
     results = []
     for match in matches[:5]:
         lecture_index, timestamp = sliding_window_vtt(match['text'], str(vtt_dir))
         if lecture_index and timestamp:
-            results.append({
-                "lecture": lecture_index,  # This will be L1, L2, etc.
-                "response": match['text'],
-                "timestamp": timestamp,
-                "score": match['score']
-            })
+            prompt = f"Answer the question using the following information:\n\n{match['text']}\n\nQuestion: {query}"
+            try:
+                chat_completion = client.chat.completions.create(
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": prompt}
+                    ],
+                    model="gpt-4"
+                )
+                
+                results.append({
+                    "lecture": lecture_index,
+                    "response": chat_completion.choices[0].message.content,
+                    "timestamp": timestamp,
+                    "score": match['score']
+                })
+            except Exception as e:
+                print(f"OpenAI API error: {e}")
+                continue
     
     return results
