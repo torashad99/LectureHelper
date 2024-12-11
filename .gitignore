@@ -1,5 +1,4 @@
 *.env
-*.jsonl
 *.vsix
 *.txt:Zone.Identifier
 *.vtt:Zone.Identifier

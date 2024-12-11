@@ -44,52 +44,45 @@ def sliding_window_vtt(best_chunk, vtt_directory):
     
     return None, None
 
-def process_query(query):
+def process_multiple_videos_query(query, video_ids):
     print("\n=== Starting Search Process ===")
-    embeddings_file = Path.cwd() / 'data' / 'embeddings' / 'embeddings.jsonl'
+    base_dir = Path(os.environ.get('RENDER_PROJECT_DIR', Path.cwd()))
+    embeddings_dir = Path(os.environ.get('DATA_DIR', base_dir / 'data' / 'embeddings'))
+    embeddings_file = embeddings_dir / 'embeddings.jsonl'
     
-    with open(embeddings_file, 'r') as f:
-        lines = f.readlines()
-        embeddings = {}
-        for line in lines:
-            line = json.loads(line)
-            embeddings[line['text']] = line['embedding']
+    if not embeddings_file.exists():
+        print(f"Embeddings file not found at {embeddings_file}")
+        return []
     
     query_embedding = get_embedding(query)
-    best_chunk = None
-    best_score = float("-inf")
+    matches = []
     
-    for chunk, embedding in embeddings.items():
-        score = np.dot(embedding, query_embedding)
-        if score > best_score:
-            best_chunk = chunk
-            best_score = score
+    # Load embeddings and find matches
+    with open(embeddings_file, 'r') as f:
+        for line in f:
+            data = json.loads(line)
+            score = np.dot(data['embedding'], query_embedding)
+            if score > 0.5:
+                matches.append({
+                    "text": data['text'],
+                    "score": float(score)
+                })
     
-    if not best_chunk:
-        return []
-        
-    system_prompt = "You are a friendly and supportive teaching assistant for a course on Text Information Systems."
-    prompt = f"Answer the question using the following information:\n\n{best_chunk}\n\nQuestion: {query}"
+    # Sort by score
+    matches.sort(key=lambda x: x['score'], reverse=True)
     
-    chat_completion = client.chat.completions.create(
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": prompt}
-        ],
-        model="gpt-4"
-    )
+    # Process top matches to find timestamps
+    results = []
+    vtt_dir = Path.cwd() / 'CS410Transcripts' / 'vtt'
     
-    response_text = chat_completion.choices[0].message.content
-    vtt_directory = Path.cwd() / 'CS410Transcripts' / 'vtt'
-    lecture_index, start_time = sliding_window_vtt(best_chunk, vtt_directory)
+    for match in matches[:5]:
+        lecture_index, timestamp = sliding_window_vtt(match['text'], str(vtt_dir))
+        if lecture_index and timestamp and lecture_index in video_ids:
+            results.append({
+                "video_id": lecture_index,
+                "response": match['text'],
+                "timestamp": timestamp,
+                "score": match['score']
+            })
     
-    if lecture_index and start_time:
-        lecture_number = int(lecture_index[1:])
-        return [{
-            "response": response_text,
-            "lecture": lecture_number,
-            "timestamp": start_time,
-            "score": float(best_score)
-        }]
-    
-    return []
+    return results
