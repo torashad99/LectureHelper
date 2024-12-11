@@ -1,0 +1,757 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:02.060
+you
+
+2
+00:00:06.550 --> 00:00:09.590
+this lecture is an overview of texture
+
+3
+00:00:09.590 --> 00:00:14.209
+retrieval methods in the previous
+
+4
+00:00:14.209 --> 00:00:16.430
+lecture we introduced to the problem of
+
+5
+00:00:16.430 --> 00:00:19.490
+tax retrieval we explained that the main
+
+6
+00:00:19.490 --> 00:00:21.860
+problem is to design a ranking function
+
+7
+00:00:21.860 --> 00:00:24.769
+to rank the documents for a query in
+
+8
+00:00:24.769 --> 00:00:27.619
+this lecture we'll give a overview of
+
+9
+00:00:27.619 --> 00:00:30.619
+different ways of designing this ranking
+
+10
+00:00:30.619 --> 00:00:35.360
+function so the problem is the following
+
+11
+00:00:35.360 --> 00:00:37.880
+we have a query that has a sequence of
+
+12
+00:00:37.880 --> 00:00:40.940
+words and the document that that's also
+
+13
+00:00:40.940 --> 00:00:43.280
+a sequence of words and we hope to
+
+14
+00:00:43.280 --> 00:00:46.670
+define a function f that can compute the
+
+15
+00:00:46.670 --> 00:00:51.320
+score based on the query and document so
+
+16
+00:00:51.320 --> 00:00:53.360
+the main channel here is the design good
+
+17
+00:00:53.360 --> 00:00:55.610
+random function that can rank all the
+
+18
+00:00:55.610 --> 00:00:57.950
+relevant documents on top of all the
+
+19
+00:00:57.950 --> 00:01:00.830
+non-random in the ones now clearly this
+
+20
+00:01:00.830 --> 00:01:02.900
+means our function must be able to
+
+21
+00:01:02.900 --> 00:01:05.810
+measure the likelihood that a document
+
+22
+00:01:05.810 --> 00:01:11.150
+that de is relevant to a query Q that
+
+23
+00:01:11.150 --> 00:01:13.610
+also means we have to have some way to
+
+24
+00:01:13.610 --> 00:01:17.510
+define relevance in particular in order
+
+25
+00:01:17.510 --> 00:01:19.820
+to implement the program to do that we
+
+26
+00:01:19.820 --> 00:01:21.800
+have to have a computational definition
+
+27
+00:01:21.800 --> 00:01:25.090
+of relevance and we achieve this goal by
+
+28
+00:01:25.090 --> 00:01:28.190
+designing a retrieval model which gives
+
+29
+00:01:28.190 --> 00:01:33.110
+us a formalization of relevance now over
+
+30
+00:01:33.110 --> 00:01:35.060
+many decades researchers have designed
+
+31
+00:01:35.060 --> 00:01:37.400
+many different kinds of retrieval models
+
+32
+00:01:37.400 --> 00:01:41.409
+and they fall into different categories
+
+33
+00:01:41.409 --> 00:01:46.280
+first one for many of the models are
+
+34
+00:01:46.280 --> 00:01:50.260
+based on the similarity idea basically
+
+35
+00:01:50.260 --> 00:01:53.120
+we assume that if a document is more
+
+36
+00:01:53.120 --> 00:01:56.270
+similar to the query then another
+
+37
+00:01:56.270 --> 00:01:58.820
+document is then we will say the first
+
+38
+00:01:58.820 --> 00:02:00.830
+document is more relevant than the
+
+39
+00:02:00.830 --> 00:02:03.350
+second one so in this case the ranking
+
+40
+00:02:03.350 --> 00:02:06.049
+function is defined as the similarity
+
+41
+00:02:06.049 --> 00:02:10.159
+between the query and the document one
+
+42
+00:02:10.159 --> 00:02:12.290
+well-known example in this case is
+
+43
+00:02:12.290 --> 00:02:14.450
+vector space model which we will cover
+
+44
+00:02:14.450 --> 00:02:18.760
+more in detail later in the
+
+45
+00:02:19.350 --> 00:02:22.150
+the second kind of models are called
+
+46
+00:02:22.150 --> 00:02:24.910
+probabilistic models in this family of
+
+47
+00:02:24.910 --> 00:02:27.400
+models we follow a very different
+
+48
+00:02:27.400 --> 00:02:31.000
+strategy where we assume that queries
+
+49
+00:02:31.000 --> 00:02:33.430
+and documents are all observations from
+
+50
+00:02:33.430 --> 00:02:38.140
+random variables and we assume there is
+
+51
+00:02:38.140 --> 00:02:41.460
+a binary random variable called are here
+
+52
+00:02:41.460 --> 00:02:43.990
+to indicate whether a document is
+
+53
+00:02:43.990 --> 00:02:47.500
+relevant to a query we then define the
+
+54
+00:02:47.500 --> 00:02:50.050
+score of a document with respect to a
+
+55
+00:02:50.050 --> 00:02:53.170
+query as the probability that this
+
+56
+00:02:53.170 --> 00:02:57.310
+random variable R is equal to 1 given a
+
+57
+00:02:57.310 --> 00:03:00.070
+particular document and query there are
+
+58
+00:03:00.070 --> 00:03:03.570
+different cases of such a general idea
+
+59
+00:03:03.570 --> 00:03:06.100
+one is classical problem is to model
+
+60
+00:03:06.100 --> 00:03:08.800
+another is language model yet another is
+
+61
+00:03:08.800 --> 00:03:12.730
+divergence from randomness model in a
+
+62
+00:03:12.730 --> 00:03:14.370
+later lecture we will talk more about
+
+63
+00:03:14.370 --> 00:03:18.190
+one case which is language model the
+
+64
+00:03:18.190 --> 00:03:19.840
+third kind of models are based on
+
+65
+00:03:19.840 --> 00:03:22.570
+probabilistic inference so here the idea
+
+66
+00:03:22.570 --> 00:03:25.570
+is to a suits it uncertainty to
+
+67
+00:03:25.570 --> 00:03:29.080
+inference rules and we can then quantify
+
+68
+00:03:29.080 --> 00:03:31.870
+the probability that we can show that
+
+69
+00:03:31.870 --> 00:03:36.450
+the query follows from the document
+
+70
+00:03:36.450 --> 00:03:40.540
+finally there is also a family of models
+
+71
+00:03:40.540 --> 00:03:45.690
+that are using X or America thinking
+
+72
+00:03:45.690 --> 00:03:48.490
+here the idea is to define a set of
+
+73
+00:03:48.490 --> 00:03:51.880
+constraints that we hope a good
+
+74
+00:03:51.880 --> 00:03:56.140
+retrieval function to satisfy so in this
+
+75
+00:03:56.140 --> 00:03:59.230
+case the problem is receipt a good
+
+76
+00:03:59.230 --> 00:04:01.630
+ranking function that can satisfy all
+
+77
+00:04:01.630 --> 00:04:06.310
+the desire the constraints interestingly
+
+78
+00:04:06.310 --> 00:04:08.440
+although these different models are
+
+79
+00:04:08.440 --> 00:04:11.260
+based on different the thinking in the
+
+80
+00:04:11.260 --> 00:04:16.090
+end the retrieval function tends to be
+
+81
+00:04:16.090 --> 00:04:19.330
+very similar and these functions tend to
+
+82
+00:04:19.330 --> 00:04:22.240
+also involve similar variables so now
+
+83
+00:04:22.240 --> 00:04:24.460
+let's take a look at the the common form
+
+84
+00:04:24.460 --> 00:04:27.550
+of a state-of-the-art retrieval model
+
+85
+00:04:27.550 --> 00:04:30.009
+and to examine some of the common ideas
+
+86
+00:04:30.009 --> 00:04:33.090
+used in all these bottles
+
+87
+00:04:33.090 --> 00:04:37.930
+first these bottles are all based on the
+
+88
+00:04:37.930 --> 00:04:41.620
+assumption of using bag of words to
+
+89
+00:04:41.620 --> 00:04:44.289
+represent text and we explained this in
+
+90
+00:04:44.289 --> 00:04:47.800
+the metronomic processing lecture bag of
+
+91
+00:04:47.800 --> 00:04:50.080
+words representation remains the main
+
+92
+00:04:50.080 --> 00:04:51.759
+representation using all the search
+
+93
+00:04:51.759 --> 00:04:56.259
+engines so with this assumption the
+
+94
+00:04:56.259 --> 00:04:58.479
+score of a query like presidential
+
+95
+00:04:58.479 --> 00:05:01.840
+campaign news with respect to a document
+
+96
+00:05:01.840 --> 00:05:04.990
+of the year would be based on scores
+
+97
+00:05:04.990 --> 00:05:08.610
+computed based on each individual world
+
+98
+00:05:08.610 --> 00:05:12.090
+and that means the score would depend on
+
+99
+00:05:12.090 --> 00:05:16.090
+the score of each award such as
+
+100
+00:05:16.090 --> 00:05:19.719
+presidential campaign and news here we
+
+101
+00:05:19.719 --> 00:05:22.930
+can see there are three different
+
+102
+00:05:22.930 --> 00:05:25.870
+components each corresponding to how
+
+103
+00:05:25.870 --> 00:05:28.479
+well the document matches each of the
+
+104
+00:05:28.479 --> 00:05:34.990
+query words inside these functions we
+
+105
+00:05:34.990 --> 00:05:39.069
+see a number of heuristics used so for
+
+106
+00:05:39.069 --> 00:05:41.969
+example one factor that affects the
+
+107
+00:05:41.969 --> 00:05:45.130
+function G here is how many times does
+
+108
+00:05:45.130 --> 00:05:47.919
+the world presidential occur in the
+
+109
+00:05:47.919 --> 00:05:49.810
+document this is called a term frequency
+
+110
+00:05:49.810 --> 00:05:54.190
+or TF we might also denote as C of
+
+111
+00:05:54.190 --> 00:06:00.069
+presidential and D in general if the
+
+112
+00:06:00.069 --> 00:06:02.169
+word occurs more frequently in the
+
+113
+00:06:02.169 --> 00:06:04.990
+document then the value of this function
+
+114
+00:06:04.990 --> 00:06:10.270
+would be larger another factor is how
+
+115
+00:06:10.270 --> 00:06:14.440
+long is the document and this is to use
+
+116
+00:06:14.440 --> 00:06:19.529
+the talking length for score in general
+
+117
+00:06:19.529 --> 00:06:23.469
+if a term occurs in a long document that
+
+118
+00:06:23.469 --> 00:06:28.389
+many times it's not as significant as if
+
+119
+00:06:28.389 --> 00:06:31.210
+it occurred the same number of times in
+
+120
+00:06:31.210 --> 00:06:33.340
+a short document because in a long
+
+121
+00:06:33.340 --> 00:06:36.490
+document any term is expected to occur
+
+122
+00:06:36.490 --> 00:06:38.319
+more frequently
+
+123
+00:06:38.319 --> 00:06:41.300
+finally there is this factor called the
+
+124
+00:06:41.300 --> 00:06:43.280
+talking the frequency and that is we
+
+125
+00:06:43.280 --> 00:06:45.409
+also want to look at how often
+
+126
+00:06:45.409 --> 00:06:47.870
+presidential occurs in the entire
+
+127
+00:06:47.870 --> 00:06:52.009
+collection and we call this talk in the
+
+128
+00:06:52.009 --> 00:06:55.639
+frequency or DF of presidential and in
+
+129
+00:06:55.639 --> 00:06:59.330
+some other models we might also use a
+
+130
+00:06:59.330 --> 00:07:03.580
+probability to characterize this
+
+131
+00:07:03.580 --> 00:07:07.490
+information so here I show the
+
+132
+00:07:07.490 --> 00:07:09.289
+probability of presidential in the
+
+133
+00:07:09.289 --> 00:07:11.840
+collection so all these are trying to
+
+134
+00:07:11.840 --> 00:07:14.150
+characterize the popularity of the term
+
+135
+00:07:14.150 --> 00:07:16.759
+in the collection in general matching a
+
+136
+00:07:16.759 --> 00:07:19.639
+rare term in the collection is
+
+137
+00:07:19.639 --> 00:07:22.310
+contributing more to the overall score
+
+138
+00:07:22.310 --> 00:07:26.000
+than matching a common term so this
+
+139
+00:07:26.000 --> 00:07:29.000
+captures some of the main ideas used in
+
+140
+00:07:29.000 --> 00:07:30.770
+pretty much all the state-of-the-art
+
+141
+00:07:30.770 --> 00:07:36.229
+retail models so thou a natural question
+
+142
+00:07:36.229 --> 00:07:40.310
+is which model works the best now it
+
+143
+00:07:40.310 --> 00:07:44.180
+turns out that many models work equally
+
+144
+00:07:44.180 --> 00:07:46.789
+well so here I listed the four major
+
+145
+00:07:46.789 --> 00:07:49.039
+models that are generally regarded as a
+
+146
+00:07:49.039 --> 00:07:51.490
+state of the art which in role models
+
+147
+00:07:51.490 --> 00:07:55.129
+pivoting the instrumentation BM 25 query
+
+148
+00:07:55.129 --> 00:07:58.699
+likely hold Pierre - when optimized
+
+149
+00:07:58.699 --> 00:08:01.099
+these models tend to perform similarly
+
+150
+00:08:01.099 --> 00:08:04.940
+and this was discussed in detail in this
+
+151
+00:08:04.940 --> 00:08:07.990
+reference at the end of this web show
+
+152
+00:08:07.990 --> 00:08:11.509
+among all these PM 25 is probably the
+
+153
+00:08:11.509 --> 00:08:14.270
+most popular it's most likely that this
+
+154
+00:08:14.270 --> 00:08:16.819
+has been used in virtually all the
+
+155
+00:08:16.819 --> 00:08:18.949
+search engines and you will also often
+
+156
+00:08:18.949 --> 00:08:21.080
+see this method disgusting research
+
+157
+00:08:21.080 --> 00:08:23.779
+papers and we'll talk more about this
+
+158
+00:08:23.779 --> 00:08:28.960
+method later in some other options
+
+159
+00:08:29.970 --> 00:08:33.720
+so to summarize the main points made in
+
+160
+00:08:33.720 --> 00:08:36.990
+this lecture are first the design of a
+
+161
+00:08:36.990 --> 00:08:38.900
+good ranking function three requires a
+
+162
+00:08:38.900 --> 00:08:41.190
+computational definition of relevance
+
+163
+00:08:41.190 --> 00:08:43.560
+and we achieve this goal by designing
+
+164
+00:08:43.560 --> 00:08:47.460
+appropriate the retrieval model second
+
+165
+00:08:47.460 --> 00:08:49.320
+the many models are equally effective
+
+166
+00:08:49.320 --> 00:08:51.650
+but we don't have a single women yet
+
+167
+00:08:51.650 --> 00:08:53.610
+researchers are still actively working
+
+168
+00:08:53.610 --> 00:08:56.490
+on this problem trying to find the
+
+169
+00:08:56.490 --> 00:09:00.500
+actual optimal reach the role model
+
+170
+00:09:00.500 --> 00:09:02.910
+finally the state of that ranking
+
+171
+00:09:02.910 --> 00:09:05.190
+functions tend to rely on the following
+
+172
+00:09:05.190 --> 00:09:08.360
+ideas first bag of words replenishing
+
+173
+00:09:08.360 --> 00:09:13.500
+second TF and document frequency of
+
+174
+00:09:13.500 --> 00:09:17.480
+words such information is used in
+
+175
+00:09:17.480 --> 00:09:19.980
+weighting function to determine the
+
+176
+00:09:19.980 --> 00:09:21.660
+overall contribution of matching the
+
+177
+00:09:21.660 --> 00:09:25.710
+world and blocking the lens these are
+
+178
+00:09:25.710 --> 00:09:27.750
+often combined in interesting ways and
+
+179
+00:09:27.750 --> 00:09:30.360
+we'll discuss how exactly they are
+
+180
+00:09:30.360 --> 00:09:33.330
+combined the two ranked documents in the
+
+181
+00:09:33.330 --> 00:09:37.950
+lectures later there are two suggested
+
+182
+00:09:37.950 --> 00:09:40.820
+the additional readings if you have time
+
+183
+00:09:40.820 --> 00:09:43.830
+the first is a paper where you can find
+
+184
+00:09:43.830 --> 00:09:45.840
+a detailed discussion and comparison of
+
+185
+00:09:45.840 --> 00:09:49.890
+multiple state-of-the-art models the
+
+186
+00:09:49.890 --> 00:09:53.010
+second is a book with a chapter that
+
+187
+00:09:53.010 --> 00:09:55.140
+gives a broad review of different
+
+188
+00:09:55.140 --> 00:09:58.010
+irretrievable models
+
+189
+00:10:02.520 --> 00:10:04.580
+you

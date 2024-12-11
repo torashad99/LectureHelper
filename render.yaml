@@ -19,8 +19,8 @@ services:
         # Copy directories needed by your application
         cp -rv backend/routes backend/services backend/utils /opt/render/project/src/ || { echo "Failed to copy routes/services/utils"; exit 1; }
 
-        # Copy CS410Transcripts directory (including vtt)
-        cp -rv backend/CS410Transcripts /opt/render/project/src/data/CS410Transcripts || { echo "Failed to copy CS410Transcripts"; exit 1; }
+        # Copy VTT files directly to the correct location
+        cp -rv backend/CS410Transcripts/vtt/* /opt/render/project/src/data/CS410Transcripts/vtt/ || { echo "Failed to copy VTT files"; exit 1; }
 
         # Copy embeddings file
         cp backend/data/embeddings/embeddings.jsonl /opt/render/project/src/data/embeddings/ || { echo "Failed to copy embeddings"; exit 1; }
