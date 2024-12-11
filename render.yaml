@@ -26,8 +26,7 @@ services:
         cp backend/data/embeddings/embeddings.jsonl /opt/render/project/src/data/embeddings/ || { echo "Failed to copy embeddings"; exit 1; }
       } 2>&1 | tee /opt/render/project/src/build.log
     startCommand: |
-        cd /opt/render/project/src && gunicorn 'app:create_app()' --workers 4 --timeout 120 --log-level debug --bind 0.0.0.0:$PORT
-
+      cd /opt/render/project/src && gunicorn 'app:create_app()' --workers 4 --timeout 120 --log-level debug --bind 0.0.0.0:$PORT
     envVars:
       - key: PYTHONPATH
         value: /opt/render/project/src
@@ -41,7 +40,7 @@ services:
     autoDeploy: true
     disk:
       name: data
-      mountPath: /opt/render/project/src/data
+      mountPath: /opt/render/project/src/persistent_data
       sizeGB: 1
     buildFilter:
       paths:
