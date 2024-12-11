@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from services.embedding_service import process_query
+from services.embedding_service import process_multiple_videos_query
 
 api_routes = Blueprint('api_routes', __name__)
 
@@ -7,18 +7,19 @@ api_routes = Blueprint('api_routes', __name__)
 def search():
     try:
         query = request.args.get('q')
+        video_ids = request.args.getlist('video_ids[]')
         
-        if not query:
+        if not query or not video_ids:
             return jsonify({
                 'success': False,
-                'error': 'Missing query'
+                'error': 'Missing query or video IDs'
             }), 400
             
-        result = process_query(query)
+        matches = process_multiple_videos_query(query, video_ids)
         
         return jsonify({
             'success': True,
-            'results': result
+            'results': matches
         })
         
     except Exception as e:
