@@ -9,21 +9,32 @@ services:
         echo "=== Installing Dependencies ===" || true
         python -m pip install --upgrade pip || true
         pip install -r requirements.txt || { echo "Failed to install requirements"; exit 1; }
+
         echo "=== Creating Directories ===" || true
         mkdir -p /opt/render/project/src/data/embeddings || { echo "Failed to create embeddings directory"; exit 1; }
         mkdir -p /opt/render/project/src/data/CS410Transcripts/vtt || { echo "Failed to create vtt directory"; exit 1; }
+
         echo "=== Copying Files ===" || true
-        cp data/embeddings/embeddings.jsonl /opt/render/project/src/data/embeddings/ || { echo "Failed to copy embeddings file"; exit 1; }
-        cp -rv * /opt/render/project/src/ || { echo "Failed to copy backend files: $?"; exit 1; }
+        # Copy only the necessary root files
+        cp -rv app.py config.py requirements.txt /opt/render/project/src/ || { echo "Failed to copy root files"; exit 1; }
+
+        # Copy directories needed by your application
+        cp -rv routes services utils CS410Transcripts /opt/render/project/src/ || { echo "Failed to copy modules"; exit 1; }
+
+        # Copy embeddings file into the specified directory
+        cp data/embeddings/embeddings.jsonl /opt/render/project/src/data/embeddings/ || { echo "Failed to copy embeddings"; exit 1; }
       } 2>&1 | tee /opt/render/project/src/build.log
     startCommand: |
-      cd /opt/render/project/src && gunicorn 'app:create_app()' --log-level debug
+      cd /opt/render/project/src && gunicorn --workers 4 --timeout 120 'app:create_app()' --log-level debug
     envVars:
       - key: PYTHONPATH
         value: /opt/render/project/src
       - key: DATA_DIR
         value: /opt/render/project/src/data/embeddings
-      - key: VTT_
+      - key: VTT_DIRECTORY
+        value: /opt/render/project/src/data/CS410Transcripts/vtt
+      - key: OPENAI_API_KEY
+        sync: false
     healthCheckPath: /api/health
     autoDeploy: true
     disk:
@@ -34,4 +45,4 @@ services:
       paths:
         - backend/**
       ignoredPaths:
-        - frontend/** 
+        - frontend/**

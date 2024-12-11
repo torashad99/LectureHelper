@@ -5,48 +5,66 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import re
 import numpy as np
+import logging
 
 load_dotenv()
 
-client = OpenAI(api_key=os.environ["OPEN_AI_API_KEY"])
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
 def get_embedding(text, model="text-embedding-3-small"):
     text = text.replace("\n", " ")
     return client.embeddings.create(input=[text], model=model).data[0].embedding
 
 def sliding_window_vtt(best_chunk, vtt_directory):
-    # Following example from examples/embeddings/openai/04_reverse_search.py
+    # Normalize the search text
     words = best_chunk.split()
     start_index = 1
     window_size = 5
     
+    # Ensure vtt_directory is a Path object
+    vtt_dir = Path(vtt_directory)
+    
+    # Debug logging
+    print(f"Searching in VTT directory: {vtt_dir}")
+    print(f"Available VTT files: {list(vtt_dir.glob('L*.vtt'))}")
+    
     for i in range(start_index, len(words) - window_size + 1):
         window = ' '.join(words[i:i+window_size])
         
-        for vtt_file in Path(vtt_directory).glob('L*.vtt'):
-            with open(vtt_file, 'r', encoding='utf-8') as f:
-                content = f.read()
-                pattern = re.compile(re.escape(window), re.IGNORECASE)
-                match = pattern.search(content)
-                
-                if match:
-                    lines = content[:match.start()].split('\n')
-                    timestamp = None
+        # Search through all lecture VTT files
+        for vtt_file in vtt_dir.glob('L*.vtt'):
+            try:
+                with open(vtt_file, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    pattern = re.compile(re.escape(window), re.IGNORECASE)
+                    match = pattern.search(content)
                     
-                    for line in reversed(lines):
-                        if '-->' in line:
-                            timestamp = line.split(' --> ')[0]
-                            break
-                    
-                    if timestamp:
-                        lecture_index = vtt_file.stem
-                        return lecture_index, timestamp
+                    if match:
+                        lines = content[:match.start()].split('\n')
+                        timestamp = None
+                        
+                        for line in reversed(lines):
+                            if '-->' in line:
+                                timestamp = line.split(' --> ')[0]
+                                break
+                        
+                        if timestamp:
+                            lecture_index = vtt_file.stem
+                            print(f"Found match in {lecture_index} at {timestamp}")
+                            return lecture_index, timestamp
+                            
+            except Exception as e:
+                print(f"Error processing {vtt_file}: {e}")
+                continue
     
+    print("No matches found in any VTT files")
     return None, None
 
-def process_multiple_videos_query(query, video_ids):
+def process_lecture_query(query):
     print("\n=== Starting Search Process ===")
-    print(f"Looking for videos: {video_ids}")
     
     # Use environment variables for paths
     base_dir = Path('/opt/render/project/src')
@@ -67,14 +85,12 @@ def process_multiple_videos_query(query, video_ids):
     with open(embeddings_file, 'r') as f:
         for line in f:
             data = json.loads(line)
-            if data.get('video_id') in video_ids:
-                score = np.dot(data['embedding'], query_embedding)
-                if score > 0.5:
-                    matches.append({
-                        "text": data['text'],
-                        "video_id": data['video_id'],
-                        "score": float(score)
-                    })
+            score = np.dot(data['embedding'], query_embedding)
+            if score > 0.5:  # Keep only relevant matches
+                matches.append({
+                    "text": data['text'],
+                    "score": float(score)
+                })
     
     # Sort by score
     matches.sort(key=lambda x: x['score'], reverse=True)
@@ -85,7 +101,7 @@ def process_multiple_videos_query(query, video_ids):
         lecture_index, timestamp = sliding_window_vtt(match['text'], str(vtt_dir))
         if lecture_index and timestamp:
             results.append({
-                "video_id": match['video_id'],
+                "lecture": lecture_index,  # This will be L1, L2, etc.
                 "response": match['text'],
                 "timestamp": timestamp,
                 "score": match['score']
