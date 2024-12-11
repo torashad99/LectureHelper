@@ -29,7 +29,6 @@ ENV/
 # Data and Model Files
 data/embeddings/
 data/user_videos/
-*.jsonl
 *.vtt
 *.txt
 *.txt:Zone.Identifier
