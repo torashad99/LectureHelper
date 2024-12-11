@@ -1,0 +1,189 @@
+you
+this lecture is an overview of texture
+retrieval methods in the previous
+lecture we introduced to the problem of
+tax retrieval we explained that the main
+problem is to design a ranking function
+to rank the documents for a query in
+this lecture we'll give a overview of
+different ways of designing this ranking
+function so the problem is the following
+we have a query that has a sequence of
+words and the document that that's also
+a sequence of words and we hope to
+define a function f that can compute the
+score based on the query and document so
+the main channel here is the design good
+random function that can rank all the
+relevant documents on top of all the
+non-random in the ones now clearly this
+means our function must be able to
+measure the likelihood that a document
+that de is relevant to a query Q that
+also means we have to have some way to
+define relevance in particular in order
+to implement the program to do that we
+have to have a computational definition
+of relevance and we achieve this goal by
+designing a retrieval model which gives
+us a formalization of relevance now over
+many decades researchers have designed
+many different kinds of retrieval models
+and they fall into different categories
+first one for many of the models are
+based on the similarity idea basically
+we assume that if a document is more
+similar to the query then another
+document is then we will say the first
+document is more relevant than the
+second one so in this case the ranking
+function is defined as the similarity
+between the query and the document one
+well-known example in this case is
+vector space model which we will cover
+more in detail later in the
+the second kind of models are called
+probabilistic models in this family of
+models we follow a very different
+strategy where we assume that queries
+and documents are all observations from
+random variables and we assume there is
+a binary random variable called are here
+to indicate whether a document is
+relevant to a query we then define the
+score of a document with respect to a
+query as the probability that this
+random variable R is equal to 1 given a
+particular document and query there are
+different cases of such a general idea
+one is classical problem is to model
+another is language model yet another is
+divergence from randomness model in a
+later lecture we will talk more about
+one case which is language model the
+third kind of models are based on
+probabilistic inference so here the idea
+is to a suits it uncertainty to
+inference rules and we can then quantify
+the probability that we can show that
+the query follows from the document
+finally there is also a family of models
+that are using X or America thinking
+here the idea is to define a set of
+constraints that we hope a good
+retrieval function to satisfy so in this
+case the problem is receipt a good
+ranking function that can satisfy all
+the desire the constraints interestingly
+although these different models are
+based on different the thinking in the
+end the retrieval function tends to be
+very similar and these functions tend to
+also involve similar variables so now
+let's take a look at the the common form
+of a state-of-the-art retrieval model
+and to examine some of the common ideas
+used in all these bottles
+first these bottles are all based on the
+assumption of using bag of words to
+represent text and we explained this in
+the metronomic processing lecture bag of
+words representation remains the main
+representation using all the search
+engines so with this assumption the
+score of a query like presidential
+campaign news with respect to a document
+of the year would be based on scores
+computed based on each individual world
+and that means the score would depend on
+the score of each award such as
+presidential campaign and news here we
+can see there are three different
+components each corresponding to how
+well the document matches each of the
+query words inside these functions we
+see a number of heuristics used so for
+example one factor that affects the
+function G here is how many times does
+the world presidential occur in the
+document this is called a term frequency
+or TF we might also denote as C of
+presidential and D in general if the
+word occurs more frequently in the
+document then the value of this function
+would be larger another factor is how
+long is the document and this is to use
+the talking length for score in general
+if a term occurs in a long document that
+many times it's not as significant as if
+it occurred the same number of times in
+a short document because in a long
+document any term is expected to occur
+more frequently
+finally there is this factor called the
+talking the frequency and that is we
+also want to look at how often
+presidential occurs in the entire
+collection and we call this talk in the
+frequency or DF of presidential and in
+some other models we might also use a
+probability to characterize this
+information so here I show the
+probability of presidential in the
+collection so all these are trying to
+characterize the popularity of the term
+in the collection in general matching a
+rare term in the collection is
+contributing more to the overall score
+than matching a common term so this
+captures some of the main ideas used in
+pretty much all the state-of-the-art
+retail models so thou a natural question
+is which model works the best now it
+turns out that many models work equally
+well so here I listed the four major
+models that are generally regarded as a
+state of the art which in role models
+pivoting the instrumentation BM 25 query
+likely hold Pierre - when optimized
+these models tend to perform similarly
+and this was discussed in detail in this
+reference at the end of this web show
+among all these PM 25 is probably the
+most popular it's most likely that this
+has been used in virtually all the
+search engines and you will also often
+see this method disgusting research
+papers and we'll talk more about this
+method later in some other options
+so to summarize the main points made in
+this lecture are first the design of a
+good ranking function three requires a
+computational definition of relevance
+and we achieve this goal by designing
+appropriate the retrieval model second
+the many models are equally effective
+but we don't have a single women yet
+researchers are still actively working
+on this problem trying to find the
+actual optimal reach the role model
+finally the state of that ranking
+functions tend to rely on the following
+ideas first bag of words replenishing
+second TF and document frequency of
+words such information is used in
+weighting function to determine the
+overall contribution of matching the
+world and blocking the lens these are
+often combined in interesting ways and
+we'll discuss how exactly they are
+combined the two ranked documents in the
+lectures later there are two suggested
+the additional readings if you have time
+the first is a paper where you can find
+a detailed discussion and comparison of
+multiple state-of-the-art models the
+second is a book with a chapter that
+gives a broad review of different
+irretrievable models
+you

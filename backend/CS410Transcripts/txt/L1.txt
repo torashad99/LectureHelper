@@ -1,0 +1,466 @@
+you
+this lecture is about natural language
+account and analysis as you see from
+this picture this is really the first
+step to process any text data texture
+there are Iying natural languages so
+computers have to understand natural
+language to some extent in order to make
+use of the data so that's the topic of
+this lecture we're going to cover three
+things first what is natural language
+processing which is the main technique
+for processing natural language to
+obtain understanding the second is the
+state of thought of NLP which stands for
+natural remedy processing finally we're
+going to cover the relation between
+natural language processing and the text
+retrieval first what is the NLP well the
+best way to explain it is to think about
+if you see a text in a foreign language
+that you can understand now what you
+have to do in order to understand that
+text this is basically what computers
+are facing right so looking at the
+simple sentence like a dog is chasing a
+boy on the playground we don't have any
+problem with understanding this sentence
+but imagine what the computer would have
+to do in order to understand it well in
+general it would have to do the
+following first we have to know doggies
+are now choosing the verb etc so this is
+called lexical analysis or part of
+speech tagging and we need to figure out
+this the syntactic categories of those
+words so that's the first step after
+that we're going to pick out the
+structure of the sentence so for example
+here it shows that a and a dog would go
+together to form a noun phrase and we
+won't have dog and E's to go first and
+there are some structures that are not
+just right but this structure shows what
+we might get if we look at the sentence
+and try to interpret the sentence some
+words would go together first and then
+they will go together with other word so
+here we show we have noun phrases as
+intermediary components and then verbal
+phrases
+finally we have a sentence and you get
+this structure we need to do something
+called a syntactic analysis or pausing
+and we may have a passer can be the
+program that would automatically create
+this structure now at this point that
+you would know the structure of this
+sentence but still you don't know the
+meaning of the sentence so we have to go
+further to semantic analysis in our mind
+we usually can map such a sentence to
+what we already know in our knowledge
+base and for example you might imagine a
+dog and that looks like that there's a
+boy and there's some activity here but
+for computer would have to use symbols
+to denote that right so we would use a
+symbol T 1 to denote a dog and B 1 to
+denote a boy and then P 1 that you know
+the playground playground now there is
+also chasing activity that's happening
+here so we have a relation chasing here
+that connects all these symbols so this
+is how computer would obtain some
+understanding of this sentence now from
+this representation we could also
+further infer some other things and we
+might indeed naturally think of
+something else when we read the text and
+this whole inference so for example if
+you believe that if someone is being
+chased and this person might be scared
+right with this rule you can see
+computers could also infer that this boy
+may be scared so this is some extra
+knowledge that you would infer based on
+some understanding of the text you can
+even go further to understand why the
+person said this sentence so this has to
+do with the use of language right this
+is called
+pragmatic analysis in order to
+understand the speech actor of a
+sentence right we say something to
+basically achieve some goal there's some
+purpose there and this has to do with
+the use of language in this case the
+person who said this sentence might be
+reminding another person to bring back
+the dog and that could be one possible
+intent to reach this level of
+understanding
+we would require all these steps and a
+computer would have to go through all
+these steps in order to complete it
+understand this sentence yet we humans
+have no trouble with understand that we
+instantly get everything and there is a
+reason for that that's because we have a
+large knowledge base in our brain and we
+can use common sense knowledge to help
+interpret the sentence Computers
+unfortunately are hard to obtain such
+understanding they don't have such a
+knowledge base they are still incapable
+of doing reasoning and uncertainties
+so that makes natural language
+processing difficult for computers but
+the fundamental reason why natural
+language processing is difficult for
+computers it's simply because natural
+language has not been designed for
+computers they the natural languages are
+designed for us to communicate there are
+other languages designed for computers
+for example programming languages those
+are harder for us so natural languages
+is designed to make our communication
+efficient as a result we omit a lot of
+common-sense knowledge because we assume
+everyone knows about that we also keep a
+lot of ambiguities because we assume the
+receiver or the hearer could know how to
+discern bigger ambiguous world based on
+the knowledge or the context there's no
+need to invent different words for
+different meanings we could overload the
+same word with different meanings
+without the problem because of these
+reasons this makes every step in natural
+language processing difficulty for
+computers and bigger is the main
+difficulty and common-sense reasoning is
+often required that's also hard so let
+me give you some examples of challenges
+here consider the world level ambiguity
+the same word can different syntactic
+categories for example design can be a
+noun or a verb the world route may have
+multiple meanings so square root in math
+sense or the root of a plant you might
+be able to think of other meanings
+there are also syntactic ambiguities for
+example the main topic of this lecture
+naturally processing care should be
+interpreted in two ways in terms of the
+structure think for a moment see if you
+can figure out we usually think of this
+as processing of natural language but
+you could also think of this as you say
+language processing is natural right so
+this is an example of syntactic
+ambiguity where we have different
+structures that can be applied to the
+same sequence of words another common
+example of ambiguous sentence is the
+following a man saw a boy with the
+telescope now in this case the question
+is who had a telescope right this is how
+the prepositional phrase attachment and
+bigger they or PB attachment ambiguity
+now we generally don't have a problem
+with these ambiguities because we have a
+lot of background knowledge to help us
+disambiguate the ambiguity another
+example of difficult is a narrow
+resolution so think about the sentence
+like a jam persuaded a bill to buy a TV
+for himself the question here is does
+himself refer to jam or bill so again
+this is something that you have to use
+some background or the context to figure
+out finally presupposition is another
+problem consider the sentence he has
+quit smoking now this obviously implies
+that he smoked before so imagine a
+computer wants to understand all these
+subtle differences and meanings it would
+have to use a lot of knowledge to figure
+out it also would have to maintain a
+large knowledge knowledge base of all
+the meanings of words and how they are
+connected to our common-sense knowledge
+of the world so this is why it's very
+difficult so as a result we are still
+not perfect in fact far from perfect in
+understanding natural language using
+computers so this slide sort of gives
+simplified view of state of large
+technologies
+we can do part of speech tagging pretty
+well so I showed 97% accuracy here now
+this number is obviously based on a
+certain data set so don't take this
+literally this just shows that we can do
+it pretty well but it's they're not
+perfect in terms of parsing we can do
+partial pausing for the world that means
+we can get noun phrase structures or
+verbal phrases structure or some segment
+of the sentence understood correctly in
+terms of the structure and in some
+evaluation without we have seen about
+90% accuracy in terms of partial pausing
+of sentences again I have to say these
+numbers are relative to the data set in
+some other data sets the numbers might
+be lower most of the existing work has
+been invalid using news data set and so
+a lot of these numbers are more or less
+biased toward news data I think about
+the social media data the accuracy
+likely is lower in terms of semantic
+analysis we are far from being able to
+do complete the understanding of a
+sentence but we have some techniques
+that would allow us to partial standing
+of the sentence so I could mention some
+of them for example we have techniques
+that can allow us to extract the
+entities and relations mentioning text
+articles for example recognizing the
+mentions of people locations
+organizations etc in text so this is
+called entity extraction we may be able
+to recognize the relations for example
+this person visited that that place or
+this person met that person or this
+campaign acquired another company such a
+relations can be extracted by using the
+current and natural remedy processing
+techniques they are not perfect but they
+can do well for some entities some
+entities are harder than others we can
+also do word sense disambiguation to
+some extent we have figure out whether
+this word in this sentence would have
+certain meaning and in another context
+the computer could figure out it
+as a different meaning again it's not
+perfect but you can do something in that
+direction we can also do sentiment
+analysis meaning to figure out the
+weather sentence is positive or negative
+this is especially useful for review
+analysis for example so these are
+examples of semantic analysis and they
+help us to obtain partial understanding
+of the sentences it's not giving us a
+complete understanding as I showed it
+before for this sentence but it would
+still help us gain understanding of the
+content and these can be useful in terms
+of inference we are not yet partly
+because of the general difficulty of
+inference and the uncertainties this is
+a general janin in artificial
+intelligence that's partly also because
+we don't have a complete semantically
+representation for natural remedy texts
+so this is hard yet in some domains
+perhaps in limited domains when you have
+a lot of restrictions on the world uses
+you may be too may be able to perform
+inference to some extent but in general
+we cannot really do that rely body
+speech act analysis is also far from
+being done and we can only do that
+analysis for various special cases so
+this roughly gives you some idea about
+the state of the art and let me also
+talk a little bit about what we can't do
+and so we can't even do one your percent
+part of speech tagging now this looks
+like a simple task but think about the
+example here the two uses of off may
+have different syntactic categories if
+you try to make a fine-grained
+distinguishing it's not that easy to
+figure out the such differences it's
+also hard to do a general or complete
+the parsing and again the same sentence
+that you saw before is example this
+ambiguity can be very hard to
+disambiguate and you can imagine example
+where you have to use a lot of knowledge
+in the context of the sentence
+or from the background in order to
+figure out the who actually had the
+telescope so is it although the sentence
+looks very simple it actually is pretty
+hard and in cases when the sentence is
+very long imagine it has four or five
+prepositional phrases and there are even
+more possibilities to figure out it's
+also harder to do precise deep semantic
+analysis so here's example in the
+sentence journal owns a restaurant how
+do we define owns exactly the word owned
+is something that we understand but it's
+very hard to precisely describe the
+meaning of home for computers so as a
+result we have robust and general or
+natural remedy processing techniques
+that can process a lot of text there are
+in a shallow way meaning we only do
+superficial analysis for example parts
+of speech tagging or partial parsing or
+recognizing sentiments and those are not
+people understanding because we're not
+really understanding the exact meaning
+of a sentence on the other hand the
+deeper understanding techniques can not
+to scare up a well meaning that they
+would fail on some and restricted a text
+and if you don't restrict the text
+domain or the use of words then these
+techniques can not work well they may
+work well based on machine learning
+techniques on the data that are similar
+to the training data that the program
+has been trained on but they generally
+wouldn't work well on the data that are
+very different from the training data so
+this pretty much summarizes the state of
+the art of naturally processing of
+course within such a short amount of
+time we can't really give you a complete
+view of NLP which is a big field and
+either expected to have to see multiple
+causes on natural language processing
+topic itself but because of its
+relevance to the topic we talked about
+it's useful for you know the
+background in case you haven't been
+exposed to that so what does that mean
+for tax retrieval well in tax retrieval
+we are dealing with all kinds of text
+it's very hard to restrict the text to a
+certain domain and we also are often
+dealing with a lot of text data so that
+means the NLP techniques must be general
+robust and efficient and that just
+implies today we can only use fairly
+shallow NLP techniques for text
+retrieval in fact most of search engines
+today use something called a bag of
+words representation now this is
+probably the simplest representation you
+can possibly think of that is the
+current text data into simply a bag of
+words meaning will keep individual words
+but will ignore all the orders of words
+and we'll keep duplicated occurrences of
+words so this is called a bag of words
+repenting when you represent the text in
+this way you ignore a lot of other
+information and that just makes it
+harder to understand that the exact
+meaning of a sentence because we've lost
+to the order but yet this representation
+tends to actually work pretty well for
+most search tasks and this is partly
+because the search task is not all that
+difficult if you see matching of some of
+the query words in a text document
+chances are that that document is about
+the topic although there are exceptions
+right so in comparison some other tasks
+for example machine translation would
+require you to understand that the
+language accurate otherwise the
+translation would be wrong so in
+comparison such tasks are relatively
+easy such a representation is often
+sufficient and that's also the
+orientation that the major search
+engines today like a Google or being are
+using of course I put in parentheses you
+know but not all of course there are
+many queries that are not answered away
+by the current search engines and they
+do require a representation that would
+go beyond a bag of words representation
+that would require more natural language
+processing to be done there is another
+reason why we have not
+use the sophisticated NLP techniques in
+modern search endings and that's because
+some retrieval techniques actually
+naturally solve the problem of NLP so
+one example is water sense
+disambiguation think about the world
+like Java
+it could mean coffee or could mean
+programming languages if you look at the
+word alone it would be ambiguous but
+when the user uses the word in the query
+usually there are other words for
+example I'm looking for usage of Java
+applet when I have applied there that
+implies Java means program language and
+that context can help us naturally
+prefer documents where Java is referring
+to program language because those
+documents would probably match applet as
+well if Java occurs in the document way
+the means coffee then you would never
+match applet of with very small
+probability right so this is the case
+when some retrieval techniques naturally
+achieve the KO of word sense
+disambiguation another example is some
+technical called feedback we will talk
+about later in some of the lectures this
+tecnique technical would allow us to add
+additional words to the query and those
+additional words could be related to the
+query words and these words can help
+matching documents where the original
+query words have not occurred so this
+achieves to some extent semantic
+matching of terms so those techniques
+also helped us bypass some of the
+difficulties in natural language
+processing however in the long run we
+still need a deeper natural language
+processing techniques in order to
+improve the accuracy of the currently
+search engines and it's particularly
+needed for complex search tasks or for
+question answering
+Google has recently launched the
+knowledge graph and this is one step
+toward that goal because knowledge graph
+would contain entities and their
+relations and this goes beyond the
+simple bag of words representation
+and such technically should help us
+improve the search engine utility
+significantly although this is the open
+topic for research and exploration in
+some in this lecture we'll talk about
+what is NLP and we've talked about the
+state of that techniques what we can do
+what we cannot do and finally we also
+explained a white bag of words
+representation remains the dominant
+representation used in modern search
+engines even though deeper NLP would be
+needed for future search engines if you
+want to know more you can take a look at
+some additional readings I only cited
+one here and that's a good starting
+point Thanks
