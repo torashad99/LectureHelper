@@ -1,5 +1,3 @@
-# Edit before submission of Milestone / Final Milestone
-
 ## Requirements
 
 - Python 3.x
