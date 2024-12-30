@@ -1,6 +1,9 @@
 Lecture Helper
 --------------
 
+![image](https://github.com/user-attachments/assets/98d667ce-7af1-4264-b491-7261afc62fcf)
+
+
 Lecture Helper is a question-answering system designed for college lectures, providing relevant responses based on lecture video content. This project aims to enhance student engagement with course material by offering an efficient way to review and retrieve information from recorded lectures.
 
 Key Features
